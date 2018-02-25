@@ -135,6 +135,6 @@ For example:
 
 ### Predictions
 
-![plant007 image](samples/plant007_rgb.png =250x) ![plant007 image](samples/plant007_rgb-ins_mask_color.png =250x) ![plant007 image](samples/plant007_rgb-fg_mask.png =250x)
+![plant007 image](samples/plant007_rgb.png) ![plant007 image](samples/plant007_rgb-ins_mask_color.png) ![plant007 image](samples/plant007_rgb-fg_mask.png)
 ![plant031 image](samples/plant031_rgb.png?raw=true "plant031 image") ![plant031 image](samples/plant031_rgb-ins_mask_color.png?raw=true "plant031 instance segmentation") ![plant031 image](samples/plant031_rgb-fg_mask.png?raw=true "plant031 foreground segmentation")
 ![plant033 image](samples/plant033_rgb.png?raw=true "plant033 image") ![plant033 image](samples/plant033_rgb-ins_mask_color.png?raw=true "plant033 instance segmentation") ![plant033 image](samples/plant033_rgb-fg_mask.png?raw=true "plant033 foreground segmentation")
