@@ -1,7 +1,7 @@
 data/processed
 data/raw
-models/
-outputs/
+models/*/
+outputs/*/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
