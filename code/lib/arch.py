@@ -116,7 +116,7 @@ class BaseCNN(nn.Module):
         self.n_filters = self.model.n_filters
 
         if use_coords:
-            first_layer = list(self.model.modules())[1]
+            first_layer = list(list(self.model.children())[0].modules())[1]
             additional_weights = torch.zeros(64, 2, 3, 3)
             new_weights = torch.cat((additional_weights, first_layer.weight.data), dim=1)
             new_weights = torch.nn.Parameter(new_weights)
