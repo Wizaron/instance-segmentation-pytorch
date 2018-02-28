@@ -21,7 +21,7 @@ In prediction phase, network inputs an image and outputs a foreground-background
 * Download and install [Anaconda](https://www.anaconda.com/download/) or [Miniconda](https://conda.io/miniconda.html)
 * Create a conda environment : 
 
-`conda env create -f instance-segmentation-pytorch/code/pytorch/conda_environment.yml`
+`conda env create -f instance-segmentation-pytorch/code/conda_environment.yml`
 
 ## Data
 
