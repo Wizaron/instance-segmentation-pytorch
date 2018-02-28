@@ -71,7 +71,7 @@ Data should be prepared prior to training and evaluation.
 * Place the extracted dataset to ``instance-segmentation-pytorch/data/raw``.  Hence, raw dataset should be found at `instance-segmentation-pytorch/data/raw/CVPPP2017_LSC_training`
 * In order to prepare the data go to ``instance-segmentation-pytorch/data/scripts`` and 
 	* ``python 1-create_annotations.py``
-	* ``python 1-remove_alpha.sh``
+	* ``sh 1-remove_alpha.sh``
 	* ``python 3-create_dataset.py``
 
 ## Visdom Server
