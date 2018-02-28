@@ -131,7 +131,7 @@ For example:
 
 `./pred.sh ../models/2018-2-24_16-1_jcmaxwell_6-459906/model_155_0.125209495425.pth`
 
-"pred.sh" calls "pred.py" for a list of images.
+`pred.sh` calls `pred.py` for a list of images.
 
 ```
 usage: pred.py [-h] --image IMAGE --model MODEL [--usegpu] --output OUTPUT
