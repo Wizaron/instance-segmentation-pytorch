@@ -68,15 +68,15 @@ Data should be prepared prior to training and evaluation.
 
 `source activate ins-seg-pytorch`
 
-* Place the extracted dataset to ``instance-segmentation-pytorch/data/raw``.  Hence, raw dataset should be found at `instance-segmentation-pytorch/data/raw/CVPPP2017_LSC_training`
-* In order to prepare the data go to ``instance-segmentation-pytorch/data/scripts`` and 
-	* ``python 1-create_annotations.py``
-	* ``sh 1-remove_alpha.sh``
-	* ``python 3-create_dataset.py``
+* Place the extracted dataset to `instance-segmentation-pytorch/data/raw`. Hence, raw dataset should be found at `instance-segmentation-pytorch/data/raw/CVPPP2017_LSC_training`
+* In order to prepare the data go to `instance-segmentation-pytorch/data/scripts` and 
+	* `python 1-create_annotations.py`
+	* `sh 1-remove_alpha.sh`
+	* `python 3-create_dataset.py`
 
 ## Visdom Server
 
-Start a [Visdom](https://github.com/facebookresearch/visdom) server in a ``screen`` or ``tmux``.
+Start a [Visdom](https://github.com/facebookresearch/visdom) server in a `screen` or `tmux`.
 
 * Activate previously created conda environment :
 
@@ -84,7 +84,7 @@ Start a [Visdom](https://github.com/facebookresearch/visdom) server in a ``scree
 
 * Start visdom server :
 
-``python -m visdom.server``
+`python -m visdom.server`
 
 * Access visdom server using `http://localhost:8097`
 
@@ -95,15 +95,27 @@ Start a [Visdom](https://github.com/facebookresearch/visdom) server in a ``scree
 `source activate ins-seg-pytorch`
 
 * Go to `instance-segmentation-pytorch/code/` and run `train.py`
-	* Arguments:
-		* `--model [model_path]`: previously trained model path. (optional)
-		* `--usegpu`: to use gpu.
-		* `--nepochs [number_of_epochs]`: Number of epochs.
-		* `--batchsize [batch_size]`: Minibatch size.
-		* `--debug`: debug mode. (plots embeddings to visdom, it reduces size of embeddings to two-dimensions using TSNE. Hence, it slows down training.)
-		* `--nworkers [n_workers]`: Number of workers that are used in data loading.
 
-As training continues, models will be saved to ``instance-segmentation-pytorch/models/``.
+```
+usage: train.py [-h] [--model MODEL] [--usegpu] [--nepochs NEPOCHS]
+                [--batchsize BATCHSIZE] [--debug] [--nworkers NWORKERS]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --model MODEL         Filepath of trained model (to continue training)
+                        [Default: '']
+  --usegpu              Enables cuda to train on gpu [Default: False]
+  --nepochs NEPOCHS     Number of epochs to train for [Default: 600]
+  --batchsize BATCHSIZE
+                        Batch size [Default: 2]
+  --debug               Activates debug mode [Default: False]
+  --nworkers NWORKERS   Number of workers for data loading (0 to do it using
+                        main process) [Default : 2]
+```
+
+Debug mode plots pixel embeddings to visdom, it reduces size of the embeddings to two-dimensions using TSNE. Hence, it slows down training.
+
+As training continues, models will be saved to `instance-segmentation-pytorch/models/`.
 
 ## Evaluation
 
@@ -113,17 +125,41 @@ After training is complete, we can make predictions.
 
 `source activate ins-seg-pytorch`
 
-* Go to `instance-segmentation-pytorch/code/` and run `./pred.sh [model_path]`. It will save predictions to ``instance-segmentation-pytorch/outputs/``.
+* Go to `instance-segmentation-pytorch/code/` and run `./pred.sh [model_path]`. It will save predictions to `instance-segmentation-pytorch/outputs/`.
 
 For example:
 
-``./pred.sh ../models/2018-2-24_16-1_jcmaxwell_6-459906/model_155_0.125209495425.pth``
+`./pred.sh ../models/2018-2-24_16-1_jcmaxwell_6-459906/model_155_0.125209495425.pth`
+
+"pred.sh" calls "pred.py" for a list of images.
+
+```
+usage: pred.py [-h] --image IMAGE --model MODEL [--usegpu] --output OUTPUT
+               [--n_workers N_WORKERS]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --image IMAGE         path of the image
+  --model MODEL         path of the model
+  --usegpu              enables cuda to predict on gpu
+  --output OUTPUT       path of the output directory
+  --n_workers N_WORKERS
+                        number of workers for clustering
+```
 
 * After prediction is complete run `python evaluate.py --pred_dir [prediction_directory]`. It will print metrics to the stdout.
 
 For example:
 
 `python evaluate.py --pred_dir ../outputs/2018-2-25_15-21_jcmaxwell_41-782743-model_257_0.124301478267`
+
+```
+usage: evaluate.py [-h] --pred_dir PRED_DIR
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --pred_dir PRED_DIR  prediction directory
+```
 
 ## Outputs
 
