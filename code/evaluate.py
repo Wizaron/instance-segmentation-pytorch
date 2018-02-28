@@ -9,8 +9,10 @@ opt = parser.parse_args()
 
 pred_dir = opt.pred_dir
 
+
 def calc_dic(n_objects_gt, n_objects_pred):
     return np.abs(n_objects_gt - n_objects_pred)
+
 
 def calc_dice(gt_seg, pred_seg):
 
@@ -19,6 +21,7 @@ def calc_dice(gt_seg, pred_seg):
 
     dice = float(nom) / float(denom)
     return dice
+
 
 def calc_bd(ins_seg_gt, ins_seg_pred):
 
@@ -41,29 +44,38 @@ def calc_bd(ins_seg_gt, ins_seg_pred):
 
     return best_dice
 
+
 def calc_sbd(ins_seg_gt, ins_seg_pred):
 
     _dice1 = calc_bd(ins_seg_gt, ins_seg_pred)
     _dice2 = calc_bd(ins_seg_pred, ins_seg_gt)
     return min(_dice1, _dice2)
 
-names = np.loadtxt('../data/metadata/validation.lst', dtype='str', delimiter=',')
-n_objects_gts = np.loadtxt('../data/metadata/number_of_instances.txt', dtype='str', delimiter=',')
+
+names = np.loadtxt('../data/metadata/validation.lst',
+                   dtype='str', delimiter=',')
+n_objects_gts = np.loadtxt(
+    '../data/metadata/number_of_instances.txt', dtype='str', delimiter=',')
 img_dir = '../data/raw/CVPPP2017_LSC_training/training/A1'
 
 dics, sbds, fg_dices = [], [], []
 for name in names:
-    if not os.path.isfile('{}/{}/{}_rgb-n_objects.npy'.format(pred_dir, name, name)):
+    if not os.path.isfile(
+            '{}/{}/{}_rgb-n_objects.npy'.format(pred_dir, name, name)):
         continue
 
     n_objects_gt = int(n_objects_gts[n_objects_gts[:, 0] == name][0][1])
-    n_objects_pred = np.load('{}/{}/{}_rgb-n_objects.npy'.format(pred_dir, name, name))
+    n_objects_pred = np.load(
+        '{}/{}/{}_rgb-n_objects.npy'.format(pred_dir, name, name))
 
-    ins_seg_gt = np.array(Image.open(os.path.join(img_dir, name + '_label.png')))
-    ins_seg_pred = np.array(Image.open(os.path.join(pred_dir, name, name + '_rgb-ins_mask.png')))
+    ins_seg_gt = np.array(Image.open(
+        os.path.join(img_dir, name + '_label.png')))
+    ins_seg_pred = np.array(Image.open(os.path.join(
+        pred_dir, name, name + '_rgb-ins_mask.png')))
 
     fg_seg_gt = np.array(Image.open(os.path.join(img_dir, name + '_fg.png')))
-    fg_seg_pred = np.array(Image.open(os.path.join(pred_dir, name, name + '_rgb-fg_mask.png')))
+    fg_seg_pred = np.array(Image.open(os.path.join(
+        pred_dir, name, name + '_rgb-fg_mask.png')))
 
     fg_seg_gt = (fg_seg_gt == 1).astype('bool')
     fg_seg_pred = (fg_seg_pred == 255).astype('bool')

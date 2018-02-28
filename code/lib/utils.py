@@ -3,7 +3,10 @@ import torchvision.transforms as transforms
 import torch
 from torch.autograd import Variable
 
-from preprocess import RandomResizedCrop, RandomHorizontalFlip, RandomVerticalFlip, RandomTranspose, RandomRotation90x, RandomRotation, AddCoordinates
+from preprocess import RandomResizedCrop, RandomHorizontalFlip, \
+    RandomVerticalFlip, RandomTranspose, RandomRotation90x, \
+    RandomRotation, AddCoordinates
+
 
 class ImageUtilities(object):
 
@@ -19,7 +22,8 @@ class ImageUtilities(object):
         return transforms.Resize((height, width), interpolation=interpolation)
 
     @staticmethod
-    def image_random_cropper_and_resizer(height, width, interpolation=Image.BILINEAR):
+    def image_random_cropper_and_resizer(
+            height, width, interpolation=Image.BILINEAR):
         return RandomResizedCrop(height, width, interpolation=interpolation)
 
     @staticmethod
@@ -43,7 +47,8 @@ class ImageUtilities(object):
         return RandomRotation(expand=expand, center=center)
 
     @staticmethod
-    def image_random_color_jitter(brightness=0, contrast=0, saturation=0, hue=0):
+    def image_random_color_jitter(
+            brightness=0, contrast=0, saturation=0, hue=0):
         return transforms.ColorJitter(brightness, contrast, saturation, hue)
 
     @staticmethod
@@ -52,7 +57,8 @@ class ImageUtilities(object):
 
     @staticmethod
     def image_normalizer(mean, std):
-        return transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=mean, std=std)])
+        return transforms.Compose(
+            [transforms.ToTensor(), transforms.Normalize(mean=mean, std=std)])
 
     @staticmethod
     def coordinate_adder(height, width):

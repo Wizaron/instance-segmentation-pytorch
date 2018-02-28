@@ -3,6 +3,7 @@ import torch.nn as nn
 import torchvision.models as models
 from torch.nn import functional as F
 
+
 class ReNet(nn.Module):
 
     def __init__(self, n_input, n_units, patch_size=(1, 1), usegpu=True):
@@ -14,16 +15,22 @@ class ReNet(nn.Module):
         assert self.patch_size_height >= 1
         assert self.patch_size_width >= 1
 
-        self.tiling = False if ((self.patch_size_height == 1) and (self.patch_size_width == 1)) else True
+        self.tiling = False if ((self.patch_size_height == 1) and (
+            self.patch_size_width == 1)) else True
 
-        self.rnn_hor = nn.GRU(n_input * self.patch_size_height * self.patch_size_width, n_units,
-                              num_layers=1, batch_first=True, bidirectional=True)
-        self.rnn_ver = nn.GRU(n_units * 2, n_units, num_layers=1, batch_first=True, bidirectional=True)
+        self.rnn_hor = nn.GRU(n_input * self.patch_size_height *
+                              self.patch_size_width, n_units,
+                              num_layers=1, batch_first=True,
+                              bidirectional=True)
+        self.rnn_ver = nn.GRU(n_units * 2, n_units, num_layers=1,
+                              batch_first=True, bidirectional=True)
 
     def tile(self, x):
 
-        n_height_padding = self.patch_size_height - x.size(2) % self.patch_size_height
-        n_width_padding = self.patch_size_width - x.size(3) % self.patch_size_width
+        n_height_padding = self.patch_size_height - \
+            x.size(2) % self.patch_size_height
+        n_width_padding = self.patch_size_width - \
+            x.size(3) % self.patch_size_width
 
         n_top_padding = n_height_padding / 2
         n_bottom_padding = n_height_padding - n_top_padding
@@ -31,7 +38,8 @@ class ReNet(nn.Module):
         n_left_padding = n_width_padding / 2
         n_right_padding = n_width_padding - n_left_padding
 
-        x = F.pad(x, (n_left_padding, n_right_padding, n_top_padding, n_bottom_padding))
+        x = F.pad(x, (n_left_padding, n_right_padding,
+                      n_top_padding, n_bottom_padding))
 
         b, n_filters, n_height, n_width = x.size()
 
@@ -41,10 +49,12 @@ class ReNet(nn.Module):
         new_height = n_height / self.patch_size_height
         new_width = n_width / self.patch_size_width
 
-        x = x.view(b, n_filters, new_height, self.patch_size_height, new_width, self.patch_size_width)
+        x = x.view(b, n_filters, new_height, self.patch_size_height,
+                   new_width, self.patch_size_width)
         x = x.permute(0, 2, 4, 1, 3, 5)
         x = x.contiguous()
-        x = x.view(b, new_height, new_width, self.patch_size_height * self.patch_size_width * n_filters)
+        x = x.view(b, new_height, new_width, self.patch_size_height *
+                   self.patch_size_width * n_filters)
         x = x.permute(0, 3, 1, 2)
         x = x.contiguous()
 
@@ -68,21 +78,22 @@ class ReNet(nn.Module):
 
     def forward(self, x):
 
-                                       #b, nf, h, w
+        # x : b, nf, h, w
         if self.tiling:
-            x = self.tile(x)           #b, nf, h, w
-        x = x.permute(0, 2, 3, 1)      #b, h, w, nf
+            x = self.tile(x)             # b, nf, h, w
+        x = x.permute(0, 2, 3, 1)        # b, h, w, nf
         x = x.contiguous()
-        x = self.rnn_forward(x, 'hor') #b, h, w, nf
-        x = x.permute(0, 2, 1, 3)      #b, w, h, nf
+        x = self.rnn_forward(x, 'hor')   # b, h, w, nf
+        x = x.permute(0, 2, 1, 3)        # b, w, h, nf
         x = x.contiguous()
-        x = self.rnn_forward(x, 'ver') #b, w, h, nf
-        x = x.permute(0, 2, 1, 3)      #b, h, w, nf
+        x = self.rnn_forward(x, 'ver')   # b, w, h, nf
+        x = x.permute(0, 2, 1, 3)        # b, h, w, nf
         x = x.contiguous()
-        x = x.permute(0, 3, 1, 2)      #b, nf, h, w
+        x = x.permute(0, 3, 1, 2)        # b, nf, h, w
         x = x.contiguous()
 
         return x
+
 
 class ModifiedVGG(nn.Module):
 
@@ -107,6 +118,7 @@ class ModifiedVGG(nn.Module):
 
         return out
 
+
 class BaseCNN(nn.Module):
 
     def __init__(self, use_coords=False, usegpu=True):
@@ -118,7 +130,8 @@ class BaseCNN(nn.Module):
         if use_coords:
             first_layer = list(list(self.model.children())[0].modules())[1]
             additional_weights = torch.zeros(64, 2, 3, 3)
-            new_weights = torch.cat((additional_weights, first_layer.weight.data), dim=1)
+            new_weights = torch.cat(
+                (additional_weights, first_layer.weight.data), dim=1)
             new_weights = torch.nn.Parameter(new_weights)
 
             first_layer.weight = new_weights
@@ -131,6 +144,7 @@ class BaseCNN(nn.Module):
 
         return out
 
+
 class Architecture(nn.Module):
 
     def __init__(self, use_instance_seg, use_coords, usegpu=True):
@@ -142,28 +156,39 @@ class Architecture(nn.Module):
         self.cnn = BaseCNN(use_coords=self.use_coords, usegpu=usegpu)
         self.renet1 = ReNet(256, 100, usegpu=usegpu)
         self.renet2 = ReNet(100 * 2, 100, usegpu=usegpu)
-        self.upsampling1 = nn.ConvTranspose2d(100 * 2, 100, kernel_size=(2, 2), stride=(2, 2))
+        self.upsampling1 = nn.ConvTranspose2d(
+            100 * 2, 100, kernel_size=(2, 2), stride=(2, 2))
         self.relu1 = nn.ReLU()
-        self.upsampling2 = nn.ConvTranspose2d(100 + self.cnn.n_filters[1], 100, kernel_size=(2, 2), stride=(2, 2))
+        self.upsampling2 = nn.ConvTranspose2d(
+            100 + self.cnn.n_filters[1], 100, kernel_size=(2, 2),
+            stride=(2, 2))
         self.relu2 = nn.ReLU()
-        #self.renet3 = ReNet(100 + self.cnn.n_filters[0], 50, usegpu=usegpu) 
-        self.fg_seg_output = nn.Conv2d(100 + self.cnn.n_filters[0], 2, kernel_size=(1, 1), stride=(1, 1))
+        # self.renet3 = ReNet(100 + self.cnn.n_filters[0], 50, usegpu=usegpu)
+        self.fg_seg_output = nn.Conv2d(
+            100 + self.cnn.n_filters[0], 2, kernel_size=(1, 1), stride=(1, 1))
 
         if self.use_instance_seg:
-            self.ins_seg_output = nn.Conv2d(100 + self.cnn.n_filters[0], 16, kernel_size=(1, 1), stride=(1, 1))
+            self.ins_seg_output = nn.Conv2d(
+                100 + self.cnn.n_filters[0], 16, kernel_size=(1, 1),
+                stride=(1, 1))
 
         self.ins_cls_cnn = nn.Sequential()
         self.ins_cls_cnn.add_module('pool1', nn.MaxPool2d(2, stride=2))
-        self.ins_cls_cnn.add_module('conv1', nn.Conv2d(100 * 2, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)))
+        self.ins_cls_cnn.add_module('conv1', nn.Conv2d(
+            100 * 2, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)))
         self.ins_cls_cnn.add_module('relu1', nn.ReLU())
-        self.ins_cls_cnn.add_module('conv2', nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)))
+        self.ins_cls_cnn.add_module('conv2', nn.Conv2d(
+            64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)))
         self.ins_cls_cnn.add_module('relu2', nn.ReLU())
         self.ins_cls_cnn.add_module('pool2', nn.MaxPool2d(2, stride=2))
-        self.ins_cls_cnn.add_module('conv3', nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)))
+        self.ins_cls_cnn.add_module('conv3', nn.Conv2d(
+            64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)))
         self.ins_cls_cnn.add_module('relu3', nn.ReLU())
-        self.ins_cls_cnn.add_module('conv4', nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)))
+        self.ins_cls_cnn.add_module('conv4', nn.Conv2d(
+            64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)))
         self.ins_cls_cnn.add_module('relu4', nn.ReLU())
-        self.ins_cls_cnn.add_module('pool3', nn.AdaptiveAvgPool2d((1, 1))) # b, nf, 1, 1
+        self.ins_cls_cnn.add_module(
+            'pool3', nn.AdaptiveAvgPool2d((1, 1)))  # b, nf, 1, 1
 
         self.ins_cls_out = nn.Sequential()
         self.ins_cls_out.add_module('linear', nn.Linear(64, 1))
@@ -177,7 +202,7 @@ class Architecture(nn.Module):
         x_dec = torch.cat((x_dec, second_skip), dim=1)
         x_dec = self.relu2(self.upsampling2(x_dec))
         x_dec = torch.cat((x_dec, first_skip), dim=1)
-        #x_dec = self.renet3(x_dec)
+        # x_dec = self.renet3(x_dec)
         fg_seg_out = self.fg_seg_output(x_dec)
         if self.use_instance_seg:
             ins_seg_out = self.ins_seg_output(x_dec)

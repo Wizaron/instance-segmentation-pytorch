@@ -5,14 +5,18 @@ import numpy as np
 
 # https://github.com/rogertrullo/pytorch/blob/rogertrullo-dice_loss/torch/nn/functional.py#L708
 
+
 def dice_coefficient(input, target, smooth=1.0):
-    """input is a torch variable of size BatchxnclassesxHxW representing log probabilities for each class
-    target is a 1-hot representation of the groundtruth, shoud have same size as the input"""
+    """input : is a torch variable of size BatchxnclassesxHxW representing
+    log probabilities for each class
+    target : is a 1-hot representation of the groundtruth, shoud have same size
+    as the input"""
 
     assert input.size() == target.size(), 'Input sizes must be equal.'
     assert input.dim() == 4, 'Input must be a 4D Tensor.'
     uniques = np.unique(target.data.cpu().numpy())
-    assert set(list(uniques)) <= set([0, 1]), 'Target must only contain zeros and ones.'
+    assert set(list(uniques)) <= set(
+        [0, 1]), 'Target must only contain zeros and ones.'
     assert smooth > 0, 'Smooth must be greater than 0.'
 
     probs = F.softmax(input, dim=1)
@@ -34,9 +38,13 @@ def dice_coefficient(input, target, smooth=1.0):
 
     return dice
 
-def dice_loss(input, target, optimize_bg=False, weight=None, smooth=1.0, size_average=True, reduce=True):
-    """input is a torch variable of size BatchxnclassesxHxW representing log probabilities for each class
-    target is a 1-hot representation of the groundtruth, shoud have same size as the input
+
+def dice_loss(input, target, optimize_bg=False, weight=None,
+              smooth=1.0, size_average=True, reduce=True):
+    """input : is a torch variable of size BatchxnclassesxHxW representing
+    log probabilities for each class
+    target : is a 1-hot representation of the groundtruth, shoud have same size
+    as the input
 
     weight (Variable, optional): a manual rescaling weight given to each
             class. If given, has to be a Variable of size "nclasses"""
@@ -44,15 +52,17 @@ def dice_loss(input, target, optimize_bg=False, weight=None, smooth=1.0, size_av
     dice = dice_coefficient(input, target, smooth=smooth)
 
     if not optimize_bg:
-        dice = dice[:, 1:]               # we ignore bg dice val, and take the fg
+        # we ignore bg dice val, and take the fg
+        dice = dice[:, 1:]
 
-    if not type(weight) is type(None):
+    if not isinstance(weight, type(None)):
         if not optimize_bg:
             weight = weight[1:]             # ignore bg weight
         weight = weight.size(0) * weight / weight.sum()  # normalize fg weights
         dice = dice * weight      # weighting
 
-    dice_loss = 1 - dice.mean(1)     # loss is calculated using mean over fg dice vals
+    # loss is calculated using mean over fg dice vals
+    dice_loss = 1 - dice.mean(1)
 
     if not reduce:
         return dice_loss
@@ -62,11 +72,15 @@ def dice_loss(input, target, optimize_bg=False, weight=None, smooth=1.0, size_av
 
     return dice_loss.sum()
 
+
 class DiceLoss(_WeightedLoss):
 
-    def __init__(self, optimize_bg=False, weight=None, smooth=1.0, size_average=True, reduce=True):
-        """input is a torch variable of size BatchxnclassesxHxW representing log probabilities for each class
-        target is a 1-hot representation of the groundtruth, shoud have same size as the input
+    def __init__(self, optimize_bg=False, weight=None,
+                 smooth=1.0, size_average=True, reduce=True):
+        """input : is a torch variable of size BatchxnclassesxHxW representing
+        log probabilities for each class
+        target : is a 1-hot representation of the groundtruth, shoud have same
+        size as the input
 
         weight (Variable, optional): a manual rescaling weight given to each
                 class. If given, has to be a Variable of size "nclasses"""
@@ -78,14 +92,19 @@ class DiceLoss(_WeightedLoss):
 
     def forward(self, input, target):
         _assert_no_grad(target)
-        return dice_loss(input, target, optimize_bg=self.optimize_bg, weight=self.weight, smooth=self.smooth, size_average=self.size_average,
+        return dice_loss(input, target, optimize_bg=self.optimize_bg,
+                         weight=self.weight, smooth=self.smooth,
+                         size_average=self.size_average,
                          reduce=self.reduce)
+
 
 class DiceCoefficient(torch.nn.Module):
 
     def __init__(self, smooth=1.0):
-        """input is a torch variable of size BatchxnclassesxHxW representing log probabilities for each class
-        target is a 1-hot representation of the groundtruth, shoud have same size as the input"""
+        """input : is a torch variable of size BatchxnclassesxHxW representing
+        log probabilities for each class
+        target : is a 1-hot representation of the groundtruth, shoud have same
+        size as the input"""
         super(DiceCoefficient, self).__init__()
 
         self.smooth = smooth
@@ -93,6 +112,7 @@ class DiceCoefficient(torch.nn.Module):
     def forward(self, input, target):
         _assert_no_grad(target)
         return dice_coefficient(input, target, smooth=self.smooth)
+
 
 if __name__ == '__main__':
     from torch.autograd import Variable
@@ -104,10 +124,10 @@ if __name__ == '__main__':
     weight = Variable(torch.FloatTensor(np.array([1.0, 1.0, 1.0, 1.0])))
 
     dice_loss_1 = DiceLoss(weight=weight)
-    #dice_loss_2 = DiceLoss(size_average=False)
-    #dice_loss_3 = DiceLoss(reduce=False)
+    # dice_loss_2 = DiceLoss(size_average=False)
+    # dice_loss_3 = DiceLoss(reduce=False)
 
     print dice_loss_1(input, target)
-    #print dice_loss_2(input, target)
-    #print dice_loss_3(input, target)
+    # print dice_loss_2(input, target)
+    # print dice_loss_3(input, target)
     print dice_coefficient(input, target, smooth=1.0)

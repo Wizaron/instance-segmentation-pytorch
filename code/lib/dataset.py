@@ -3,11 +3,13 @@ from torch.utils.data import Dataset
 import random
 
 from PIL import Image
-import lmdb, sys
+import lmdb
+import sys
 import numpy as np
 from StringIO import StringIO
 
 from utils import ImageUtilities as IU
+
 
 class SegDataset(Dataset):
     """Dataset Reader"""
@@ -58,15 +60,19 @@ class SegDataset(Dataset):
             = self.__load_data(index)
 
         return image, annotation, \
-               n_objects
+            n_objects
 
     def __len__(self):
         return self.n_samples
 
+
 class AlignCollate(object):
 
-    def __init__(self, mode, max_n_objects, mean, std, image_height, image_width, random_horizontal_flipping=True, random_vertical_flipping=True,
-                 random_90x_rotation=True, random_rotation=True, random_color_jittering=True, use_coordinates=False):
+    def __init__(self, mode, max_n_objects, mean, std, image_height,
+                 image_width, random_hor_flipping=True,
+                 random_ver_flipping=True,
+                 random_90x_rotation=True, random_rotation=True,
+                 random_color_jittering=True, use_coordinates=False):
 
         self._mode = mode
         self.max_n_objects = max_n_objects
@@ -78,8 +84,8 @@ class AlignCollate(object):
         self.image_height = image_height
         self.image_width = image_width
 
-        self.random_horizontal_flipping = random_horizontal_flipping
-        self.random_vertical_flipping = random_vertical_flipping
+        self.random_horizontal_flipping = random_hor_flipping
+        self.random_vertical_flipping = random_ver_flipping
         self.random_90x_rotation = random_90x_rotation
         self.random_rotation = random_rotation
         self.random_color_jittering = random_color_jittering
@@ -96,7 +102,8 @@ class AlignCollate(object):
             if self.random_rotation:
                 self.rotator = IU.image_random_rotator(expand=True)
             if self.random_color_jittering:
-                  self.color_jitter = IU.image_random_color_jitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1)
+                self.color_jitter = IU.image_random_color_jitter(
+                    brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1)
 
             self.img_resizer = IU.image_resizer(self.image_height,
                                                 self.image_width)
@@ -113,7 +120,8 @@ class AlignCollate(object):
         self.image_normalizer = IU.image_normalizer(self.mean, self.std)
 
         if self.use_coordinates:
-            self.coordinate_adder = IU.coordinate_adder(self.image_height, self.image_width)
+            self.coordinate_adder = IU.coordinate_adder(
+                self.image_height, self.image_width)
 
     def __preprocess(self, image, annotation):
 
@@ -207,25 +215,28 @@ class AlignCollate(object):
         images = list(images)
         annotations = list(annotations)
 
-        #max_n_objects = np.max(n_objects)
+        # max_n_objects = np.max(n_objects)
 
         bs = len(images)
         for i in range(bs):
             image, annotation = self.__preprocess(images[i],
-                                    annotations[i])
+                                                  annotations[i])
 
             images[i] = image
             annotations[i] = annotation
 
         images = torch.stack(images)
 
-        annotations = np.array(annotations, dtype='int') # bs, h, w, n_ins
+        annotations = np.array(annotations, dtype='int')  # bs, h, w, n_ins
 
         annotations_for_fg = annotations.sum(3)
         annotations_for_fg[annotations_for_fg != 0] = 1
         fg_annotations = np.eye(2, dtype='int')
-        fg_annotations = fg_annotations[annotations_for_fg.flatten()].reshape(annotations.shape[0], annotations.shape[1],
-                                                                              annotations.shape[2], 2)
+        fg_annotations = \
+            fg_annotations[annotations_for_fg.flatten()].reshape(annotations.shape[0],
+                                                                 annotations.shape[1],
+                                                                 annotations.shape[2],
+                                                                 2)
 
         annotations = torch.LongTensor(annotations)
         annotations = annotations.permute(0, 3, 1, 2)
@@ -237,6 +248,7 @@ class AlignCollate(object):
 
         return (images, fg_annotations, annotations,
                 n_objects)
+
 
 if __name__ == '__main__':
     ds = SegDataset('../../../data/processed/lmdb/training-lmdb/')
