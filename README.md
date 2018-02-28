@@ -127,9 +127,7 @@ After training is complete, we can make predictions.
 
 * Go to `instance-segmentation-pytorch/code/` and run `./pred.sh [model_path]`. It will save predictions to `instance-segmentation-pytorch/outputs/`.
 
-For example:
-
-`./pred.sh ../models/2018-2-24_16-1_jcmaxwell_6-459906/model_155_0.125209495425.pth`
+For example: `./pred.sh ../models/2018-2-24_16-1_jcmaxwell_6-459906/model_155_0.125209495425.pth`
 
 `pred.sh` calls `pred.py` for a list of images.
 
@@ -149,9 +147,7 @@ optional arguments:
 
 * After prediction is complete run `python evaluate.py --pred_dir [prediction_directory]`. It will print metrics to the stdout.
 
-For example:
-
-`python evaluate.py --pred_dir ../outputs/2018-2-25_15-21_jcmaxwell_41-782743-model_257_0.124301478267`
+For example: `python evaluate.py --pred_dir ../outputs/2018-2-25_15-21_jcmaxwell_41-782743-model_257_0.124301478267`
 
 ```
 usage: evaluate.py [-h] --pred_dir PRED_DIR
