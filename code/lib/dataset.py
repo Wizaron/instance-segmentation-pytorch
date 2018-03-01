@@ -251,37 +251,29 @@ class AlignCollate(object):
 
 
 if __name__ == '__main__':
-    ds = SegDataset('../../../data/processed/lmdb/training-lmdb/')
-    image, image_rgb, annotation, box_annotation, box_coordinate, \
-        n_objects = ds[5]
+    ds = SegDataset('../../data/processed/lmdb/training-lmdb/')
+    image, annotation, n_objects = ds[5]
 
     print image.size
-    print image_rgb.size
     print annotation.shape
-    print box_annotation.shape
-    print box_coordinate.shape
     print n_objects
     print np.unique(annotation)
-    print np.unique(box_annotation)
 
-    ac = AlignCollate([0.0, 0.0, 0.0], [1.0, 1.0, 1.0],
-                      256, 512, 256, 512)
+    ac = AlignCollate('training', 20, [0.0, 0.0, 0.0],
+                      [1.0, 1.0, 1.0], 256, 256)
 
-    loader = torch.utils.data.DataLoader(ds, batch_size=9,
-                                         shuffle=True,
-                                         num_workers=1,
+    loader = torch.utils.data.DataLoader(ds, batch_size=3,
+                                         shuffle=False,
+                                         num_workers=0,
                                          pin_memory=False,
                                          collate_fn=ac)
     loader = iter(loader)
 
-    images, images_rgb, annotations, box_annotations, \
-        box_coordinates, n_objects = loader.next()
+    images, fg_annotations, annotations, \
+        n_objects = loader.next()
 
     print images.size()
-    print images_rgb.size()
+    print fg_annotations.size()
     print annotations.size()
-    print box_annotations.size()
-    print box_coordinates.size()
-    print box_coordinates
     print n_objects.size()
     print n_objects
