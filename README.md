@@ -42,7 +42,7 @@ In prediction phase, network inputs an image and outputs a semantic segmentation
 		* **lib/losses/dice.py**: Dice loss for foreground semantic segmentation.
 		* **lib/losses/discriminative.py**: [Discriminative loss](https://arxiv.org/pdf/1708.02551.pdf) for instance segmentation.
 	* **settings**
-        	* **settings/CVPPP**: Settings for CVPPP dataset.
+		* **settings/CVPPP**: Settings for CVPPP dataset.
 			* **settings/CVPPP/data_settings.py**: Defines settings about data.
 			* **settings/CVPPP/model_settings.py**: Defines settings about model (hyper-parameters). 
 			* **settings/CVPPP/training_settings.py**: Defines settings for training (optimization method, weight decay, augmentation, etc.).
