@@ -34,7 +34,7 @@ In prediction phase, network inputs an image and outputs a semantic segmentation
 * **code**: Codes for training and evaluation.
 	* **lib**
 		* **lib/cvppp_arch.py**: Defines network architecture for CVPPP dataset.
-                * **lib/cityscapes_arch.py**: Defines network architecture for cityscapes dataset.
+		* **lib/cityscapes_arch.py**: Defines network architecture for cityscapes dataset.
 		* **lib/model.py**: Defines model (optimization, criterion, fit, predict, test, etc.).
 		* **lib/dataset.py**: Data loading, augmentation, minibatching procedures.
 		* **lib/preprocess.py**, **lib/utils**: Augmentation methods.
@@ -42,29 +42,18 @@ In prediction phase, network inputs an image and outputs a semantic segmentation
 		* **lib/losses/dice.py**: Dice loss for foreground semantic segmentation.
 		* **lib/losses/discriminative.py**: [Discriminative loss](https://arxiv.org/pdf/1708.02551.pdf) for instance segmentation.
 	* **settings**
-		* **settings/CVPPP**: Settings for CVPPP dataset.
-			* **settings/CVPPP/data_settings.py**: Defines settings about data.
-			* **settings/CVPPP/model_settings.py**: Defines settings about model (hyper-parameters). 
-			* **settings/CVPPP/training_settings.py**: Defines settings for training (optimization method, weight decay, augmentation, etc.).
-		* **settings/cityscapes**: Settings for cityscapes dataset.
-                        * **settings/cityscapes/data_settings.py**: Defines settings about data.
-                        * **settings/cityscapes/model_settings.py**: Defines settings about model (hyper-parameters).
-                        * **settings/cityscapes/training_settings.py**: Defines settings for training (optimization method, weight decay, augmentation, etc.).
+		* **settings/CVPPP/data_settings.py**, **settings/cityscapes/data_settings.py**: Defines settings about data.
+		* **settings/CVPPP/model_settings.py**, **settings/cityspcaes/model_settings.py**: Defines settings about model (hyper-parameters). 
+		* **settings/CVPPP/training_settings.py**, **settings/cityscapes/training_settings.py**: Defines settings for training (optimization method, weight decay, augmentation, etc.).
 	* **train.py**: Training script.
 	* **pred.py**: Prediction script.
 	* **pred_cvppp_validation.sh**: Runs predictions on validation subset of CVPPP dataset.
 	* **pred_cityscapes_validation.sh**: Runs predictions on validation subset of cityscapes dataset.
 	* **evaluate.py**: Evaluation script. Calculates SBD (symmetric best dice), |DiC| (absolute difference in count) and Foreground Dice (Dice score for semantic segmentation) as defined in the [paper](http://eprints.nottingham.ac.uk/34197/1/MVAP-D-15-00134_Revised_manuscript.pdf).
 * **data**:  Stores data and scripts to prepare dataset for training and evaluation.
-	* **metadata**: Stores metadata; such as, training, validation and test splits, image shapes etc.
-		* **metadata/CVPPP**: For CVPPP dataset.
-		* **metadata/cityscapes**: For cityscapes dataset.
-	* **processed**: Stores processed form of the data.
-		* **processed/CVPPP**: For CVPPP dataset.
-		* **processed/cityscapes**: For cityscapes dataset.
-	* **raw**: Stores raw form of the data.
-		* **raw/CVPPP**: For CVPPP dataset.
-		* **raw/cityscapes**: For cityscapes dataset.
+	* **metadata/CVPPP**, **metadata/cityscapes**: Stores metadata; such as, training, validation and test splits, image shapes etc.
+	* **processed/CVPPP**, **metadata/cityscapes**: Stores processed form of the data.
+	* **raw/CVPPP**, **raw/cityscapes**: Stores raw form of the data.
 	* **scripts**: Stores scripts to prepare dataset.
 		* **scripts/CVPPP**: For CVPPP dataset.
 			* **scripts/CVPPP/1-create_annotations.py**: Saves annotations as a numpy array to `processed/CVPPP/semantic-annotations/` and `processed/CVPPP/instance-annotations`.
@@ -75,12 +64,9 @@ In prediction phase, network inputs an image and outputs a semantic segmentation
 			* **scripts/CVPPP/3-create_dataset.py**: Creates an lmdb dataset to `processed/CVPPP/lmdb/`.
 		* **scripts/cityscapes**: For cityscapes dataset.
 			* **scripts/cityscapes/1-create-annotations.py**: Saves annotations as a numpy array to `processed/cityscapes/semantic-annotations` and `processed/cityscapes/instance-annotations`, saves the number of instances in each image to `metadata/cityscapes/number_of_instances.txt` and save subset lists to `metadata/cityscapes/training.lst` and `metadata/cityscapes/validation.lst`.
-* **models**: Stores checkpoints of the trained models.
-	* **models/CVPPP**: For CVPPP models.
-	* **models/cityscapes**: For cityscapes models.
-* **outputs**: Stores predictions of the trained models.
-	* **outputs/CVPPP**: For CVPPP models.
-	* **outputs/cityscapes**: For cityscapes models.
+			* **scrits/cityscapes/3-create_dataset.py**: Creates an lmdb dataset to `processed/cityscapes/lmdb/`.
+* **models/CVPPP**, **models/cityscapes**: Stores checkpoints of the trained models.
+* **outputs/CVPPP**, **outputs/cityscapes**: Stores predictions of the trained models.
 
 ## Data Preparation
 
