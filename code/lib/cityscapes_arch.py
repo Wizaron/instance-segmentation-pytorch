@@ -166,7 +166,15 @@ class Architecture(nn.Module):
         self.relu2 = nn.ReLU()
         # self.renet3 = ReNet(100 + self.cnn.n_filters[0], 50, usegpu=usegpu)
         self.sem_seg_output = nn.Conv2d(
-            100 + self.cnn.n_filters[0], self.n_classes, kernel_size=(1, 1), stride=(1, 1))
+            100 +
+            self.cnn.n_filters[0],
+            self.n_classes,
+            kernel_size=(
+                1,
+                1),
+            stride=(
+                1,
+                1))
 
         if self.use_instance_seg:
             self.ins_seg_output = nn.Conv2d(

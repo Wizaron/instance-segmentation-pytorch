@@ -13,5 +13,7 @@ mkdir -p ${out_dir}
 while read line;
 do
   _dir=`echo $line | cut -f1 -d"_"`
-  python pred.py --image ${img_dir}/${_dir}/${line}_leftImg8bit.png --model $model --usegpu --output ${out_dir}/${line} --n_workers ${n_workers} --dataset cityscapes
+  python pred.py --image ${img_dir}/${_dir}/${line}_leftImg8bit.png \
+    --model $model --usegpu --output ${out_dir}/${line} \
+    --n_workers ${n_workers} --dataset cityscapes
 done < ../data/metadata/cityscapes/validation.lst

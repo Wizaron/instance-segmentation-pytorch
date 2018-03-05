@@ -1,10 +1,13 @@
-import os, glob
+import os
+import glob
 import numpy as np
 from PIL import Image
 
-DATA_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir, os.path.pardir, os.path.pardir))
+DATA_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir,
+                                        os.path.pardir, os.path.pardir))
 ANN_DIR = os.path.join(DATA_DIR, 'processed', 'CVPPP', 'instance-annotations')
-IMG_DIR = os.path.join(DATA_DIR, 'raw', 'CVPPP', 'CVPPP2017_LSC_training', 'training', 'A1')
+IMG_DIR = os.path.join(DATA_DIR, 'raw', 'CVPPP', 'CVPPP2017_LSC_training',
+                       'training', 'A1')
 OUTPUT_DIR = os.path.join(DATA_DIR, 'metadata', 'CVPPP')
 
 annotation_files = glob.glob(os.path.join(ANN_DIR, '*.npy'))
@@ -21,4 +24,5 @@ for f in annotation_files:
 
     image_shapes.append([image_name, ann_size[0], ann_size[1]])
 
-np.savetxt(os.path.join(OUTPUT_DIR, 'image_shapes.txt'), image_shapes, fmt='%s', delimiter=',')
+np.savetxt(os.path.join(OUTPUT_DIR, 'image_shapes.txt'), image_shapes,
+           fmt='%s', delimiter=',')

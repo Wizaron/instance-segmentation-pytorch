@@ -12,5 +12,6 @@ mkdir -p ${out_dir}
 
 while read line;
 do
-  python pred.py --image ${img_dir}/${line}_rgb.png --model $model --usegpu --output ${out_dir}/${line} --n_workers ${n_workers} --dataset CVPPP
+  python pred.py --image ${img_dir}/${line}_rgb.png --model $model --usegpu \
+    --output ${out_dir}/${line} --n_workers ${n_workers} --dataset CVPPP
 done < ../data/metadata/CVPPP/validation.lst

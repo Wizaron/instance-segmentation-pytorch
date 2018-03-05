@@ -1,12 +1,18 @@
 import lmdb
 import numpy as np
 
+
 def write_cache(env, cache):
     with env.begin(write=True) as txn:
         for k, v in cache.iteritems():
             txn.put(k, v)
 
-def create_dataset(output_path, image_paths, semantic_annotation_paths, instance_annotation_paths):
+
+def create_dataset(
+        output_path,
+        image_paths,
+        semantic_annotation_paths,
+        instance_annotation_paths):
 
     n_images = len(image_paths)
 
@@ -33,10 +39,14 @@ def create_dataset(output_path, image_paths, semantic_annotation_paths, instance
         n_objects = instance_annotation.shape[2]
 
         cache['image-{}'.format(n_images_cntr)] = image
-        cache['semantic-annotation-{}'.format(n_images_cntr)] = semantic_annotation.tostring()
-        cache['instance-annotation-{}'.format(n_images_cntr)] = instance_annotation.tostring()
-        cache['height-{}'.format(n_images_cntr)] = str(semantic_annotation_height)
-        cache['width-{}'.format(n_images_cntr)] = str(semantic_annotation_width)
+        cache['semantic-annotation-{}'.format(n_images_cntr)
+              ] = semantic_annotation.tostring()
+        cache['instance-annotation-{}'.format(n_images_cntr)
+              ] = instance_annotation.tostring()
+        cache['height-{}'.format(n_images_cntr)
+              ] = str(semantic_annotation_height)
+        cache['width-{}'.format(n_images_cntr)
+              ] = str(semantic_annotation_width)
         cache['n_objects-{}'.format(n_images_cntr)] = str(n_objects)
 
         if n_images_cntr % 50 == 0:

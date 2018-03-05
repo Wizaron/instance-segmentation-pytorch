@@ -1,16 +1,20 @@
-import os, glob
+import os
+import glob
 import numpy as np
 from PIL import Image
 
-DATA_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir, os.path.pardir, os.path.pardir))
-SEMANTIC_ANN_DIR = os.path.join(DATA_DIR, 'processed', 'cityscapes', 'semantic-annotations', 'train')
+DATA_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir,
+                                        os.path.pardir, os.path.pardir))
+SEMANTIC_ANN_DIR = os.path.join(DATA_DIR, 'processed', 'cityscapes',
+                                'semantic-annotations', 'train')
 IMG_DIR = os.path.join(DATA_DIR, 'raw', 'cityscapes', 'leftImg8bit', 'train')
 
 image_list = glob.glob(os.path.join(IMG_DIR, '*', '*.png'))
 
 reds, greens, blues = [], [], []
 for image_path in image_list:
-    image_name = os.path.splitext(os.path.basename(image_path))[0].split('_leftImg8bit')[0]
+    image_name = os.path.splitext(os.path.basename(image_path))[
+        0].split('_leftImg8bit')[0]
     semantic_ann_path = os.path.join(SEMANTIC_ANN_DIR, image_name + '.npy')
 
     if not os.path.isfile(semantic_ann_path):

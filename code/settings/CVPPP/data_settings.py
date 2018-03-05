@@ -6,8 +6,13 @@ class DataSettings(object):
 
     def __init__(self):
 
-        self.BASE_PATH = os.path.abspath(os.path.join(
-            __file__, os.path.pardir, os.path.pardir, os.path.pardir, os.path.pardir))
+        self.BASE_PATH = os.path.abspath(
+            os.path.join(
+                __file__,
+                os.path.pardir,
+                os.path.pardir,
+                os.path.pardir,
+                os.path.pardir))
         # self.CLASS_WEIGHTS = np.loadtxt(os.path.join(self.BASE_PATH, 'data',
         #                                              'metadata',
         #                                              'class_weights.txt'),

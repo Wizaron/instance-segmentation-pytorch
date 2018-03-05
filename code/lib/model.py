@@ -17,8 +17,15 @@ from losses import DiceLoss, DiceCoefficient, DiscriminativeLoss
 
 class Model(object):
 
-    def __init__(self, dataset, n_classes, max_n_objects, use_instance_segmentation=False,
-                 use_coords=False, load_model_path='', usegpu=True):
+    def __init__(
+            self,
+            dataset,
+            n_classes,
+            max_n_objects,
+            use_instance_segmentation=False,
+            use_coords=False,
+            load_model_path='',
+            usegpu=True):
 
         self.dataset = dataset
         self.n_classes = n_classes
@@ -32,11 +39,15 @@ class Model(object):
 
         if self.dataset == 'CVPPP':
             self.model = CVPPPArchitecture(
-                self.n_classes, self.use_instance_segmentation, self.use_coords,
+                self.n_classes,
+                self.use_instance_segmentation,
+                self.use_coords,
                 usegpu=self.usegpu)
         elif self.dataset == 'cityscapes':
             self.model = CityscapesArchitecture(
-                self.n_classes, self.use_instance_segmentation, self.use_coords,
+                self.n_classes,
+                self.use_instance_segmentation,
+                self.use_coords,
                 usegpu=self.usegpu)
 
         self.__load_weights()
@@ -270,8 +281,8 @@ class Model(object):
             _, gpu_sem_seg_annotations_criterion_ce = \
                 gpu_sem_seg_annotations.max(1)
             ce_cost = self.criterion_ce(
-                sem_seg_predictions.permute(0, 2,
-                                            3, 1).contiguous().view(-1, self.n_classes),
+                sem_seg_predictions.permute(0, 2, 3, 1).contiguous().view(
+                    -1, self.n_classes),
                 gpu_sem_seg_annotations_criterion_ce.view(-1))
             cost += ce_cost
             out_metrics['CE Cost'] = ce_cost.data

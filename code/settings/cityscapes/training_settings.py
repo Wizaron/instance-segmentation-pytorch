@@ -8,9 +8,19 @@ class TrainingSettings(ModelSettings):
         super(TrainingSettings, self).__init__()
 
         self.TRAINING_LMDB = os.path.join(
-            self.BASE_PATH, 'data', 'processed', 'cityscapes', 'lmdb', 'training-lmdb')
+            self.BASE_PATH,
+            'data',
+            'processed',
+            'cityscapes',
+            'lmdb',
+            'training-lmdb')
         self.VALIDATION_LMDB = os.path.join(
-            self.BASE_PATH, 'data', 'processed', 'cityscapes', 'lmdb', 'validation-lmdb')
+            self.BASE_PATH,
+            'data',
+            'processed',
+            'cityscapes',
+            'lmdb',
+            'validation-lmdb')
 
         self.TRAIN_CNN = True
 

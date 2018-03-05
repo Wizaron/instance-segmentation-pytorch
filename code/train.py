@@ -83,14 +83,20 @@ if opt.usegpu:
 train_dataset = SegDataset(ts.TRAINING_LMDB)
 assert train_dataset
 
-train_align_collate = AlignCollate('training', ts.N_CLASSES, ts.MAX_N_OBJECTS, ts.MEAN,
-                                   ts.STD, ts.IMAGE_HEIGHT, ts.IMAGE_WIDTH,
-                                   random_hor_flipping=ts.HORIZONTAL_FLIPPING,
-                                   random_ver_flipping=ts.VERTICAL_FLIPPING,
-                                   random_90x_rotation=ts.ROTATION_90X,
-                                   random_rotation=ts.ROTATION,
-                                   random_color_jittering=ts.COLOR_JITTERING,
-                                   use_coordinates=ts.USE_COORDINATES)
+train_align_collate = AlignCollate(
+    'training',
+    ts.N_CLASSES,
+    ts.MAX_N_OBJECTS,
+    ts.MEAN,
+    ts.STD,
+    ts.IMAGE_HEIGHT,
+    ts.IMAGE_WIDTH,
+    random_hor_flipping=ts.HORIZONTAL_FLIPPING,
+    random_ver_flipping=ts.VERTICAL_FLIPPING,
+    random_90x_rotation=ts.ROTATION_90X,
+    random_rotation=ts.ROTATION,
+    random_color_jittering=ts.COLOR_JITTERING,
+    use_coordinates=ts.USE_COORDINATES)
 
 train_loader = torch.utils.data.DataLoader(train_dataset,
                                            batch_size=opt.batchsize,
@@ -102,14 +108,20 @@ train_loader = torch.utils.data.DataLoader(train_dataset,
 test_dataset = SegDataset(ts.VALIDATION_LMDB)
 assert test_dataset
 
-test_align_collate = AlignCollate('test', ts.N_CLASSES, ts.MAX_N_OBJECTS, ts.MEAN, ts.STD,
-                                  ts.IMAGE_HEIGHT, ts.IMAGE_WIDTH,
-                                  random_hor_flipping=ts.HORIZONTAL_FLIPPING,
-                                  random_ver_flipping=ts.VERTICAL_FLIPPING,
-                                  random_90x_rotation=ts.ROTATION_90X,
-                                  random_rotation=ts.ROTATION,
-                                  random_color_jittering=ts.COLOR_JITTERING,
-                                  use_coordinates=ts.USE_COORDINATES)
+test_align_collate = AlignCollate(
+    'test',
+    ts.N_CLASSES,
+    ts.MAX_N_OBJECTS,
+    ts.MEAN,
+    ts.STD,
+    ts.IMAGE_HEIGHT,
+    ts.IMAGE_WIDTH,
+    random_hor_flipping=ts.HORIZONTAL_FLIPPING,
+    random_ver_flipping=ts.VERTICAL_FLIPPING,
+    random_90x_rotation=ts.ROTATION_90X,
+    random_rotation=ts.ROTATION,
+    random_color_jittering=ts.COLOR_JITTERING,
+    use_coordinates=ts.USE_COORDINATES)
 
 test_loader = torch.utils.data.DataLoader(test_dataset,
                                           batch_size=opt.batchsize,

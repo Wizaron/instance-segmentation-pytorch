@@ -56,11 +56,14 @@ def calc_sbd(ins_seg_gt, ins_seg_pred):
     _dice2 = calc_bd(ins_seg_pred, ins_seg_gt)
     return min(_dice1, _dice2)
 
+
 if opt.dataset == 'CVPPP':
     names = np.loadtxt('../data/metadata/CVPPP/validation.lst',
                        dtype='str', delimiter=',')
     n_objects_gts = np.loadtxt(
-        '../data/metadata/CVPPP/number_of_instances.txt', dtype='str', delimiter=',')
+        '../data/metadata/CVPPP/number_of_instances.txt',
+        dtype='str',
+        delimiter=',')
     img_dir = '../data/raw/CVPPP/CVPPP2017_LSC_training/training/A1'
 
     dics, sbds, fg_dices = [], [], []
@@ -78,7 +81,12 @@ if opt.dataset == 'CVPPP':
         ins_seg_pred = np.array(Image.open(os.path.join(
             pred_dir, name, name + '_rgb-ins_mask.png')))
 
-        fg_seg_gt = np.array(Image.open(os.path.join(img_dir, name + '_fg.png')))
+        fg_seg_gt = np.array(
+            Image.open(
+                os.path.join(
+                    img_dir,
+                    name +
+                    '_fg.png')))
         fg_seg_pred = np.array(Image.open(os.path.join(
             pred_dir, name, name + '_rgb-fg_mask.png')))
 

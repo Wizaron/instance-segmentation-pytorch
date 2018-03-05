@@ -55,7 +55,6 @@ class SegDataset(Dataset):
             instance_annotation = instance_annotation.reshape(height, width,
                                                               n_objects)
 
-
         return img, semantic_annotation, instance_annotation, n_objects
 
     def __getitem__(self, index):
@@ -149,7 +148,8 @@ class AlignCollate(object):
                     _ann = self.horizontal_flipper(_ann, is_flip)
                     instance_annotation[i] = _ann
 
-                semantic_annotation = self.horizontal_flipper(semantic_annotation, is_flip)
+                semantic_annotation = self.horizontal_flipper(
+                    semantic_annotation, is_flip)
 
             if self.random_vertical_flipping:
                 is_flip = random.random() < 0.5
@@ -160,7 +160,8 @@ class AlignCollate(object):
                     _ann = self.vertical_flipper(_ann, is_flip)
                     instance_annotation[i] = _ann
 
-                semantic_annotation = self.vertical_flipper(semantic_annotation, is_flip)
+                semantic_annotation = self.vertical_flipper(
+                    semantic_annotation, is_flip)
 
             if self.random_90x_rotation:
                 n_rot = np.random.choice([0, 1, 2, 3])
@@ -171,7 +172,8 @@ class AlignCollate(object):
                     _ann = self.rotator_90x(_ann, n_rot)
                     instance_annotation[i] = _ann
 
-                semantic_annotation = self.rotator_90x(semantic_annotation, n_rot)
+                semantic_annotation = self.rotator_90x(
+                    semantic_annotation, n_rot)
 
             if self.random_rotation:
                 angle = self.rotator.get_params(10)
@@ -182,9 +184,11 @@ class AlignCollate(object):
                     _ann = self.rotator(_ann, angle, Image.NEAREST)
                     instance_annotation[i] = _ann
 
-                semantic_annotation = self.rotator(semantic_annotation, angle, Image.NEAREST)
+                semantic_annotation = self.rotator(
+                    semantic_annotation, angle, Image.NEAREST)
 
-            instance_annotation = np.array(instance_annotation).transpose(1, 2, 0)
+            instance_annotation = np.array(
+                instance_annotation).transpose(1, 2, 0)
 
         # Resize Images
         image = self.img_resizer(image)
@@ -212,11 +216,14 @@ class AlignCollate(object):
             zero = np.array(zero)
             instance_annotation_resized.append(zero.copy())
 
-        instance_annotation_resized = np.stack(instance_annotation_resized, axis=0)
-        instance_annotation_resized = instance_annotation_resized.transpose(1, 2, 0)
+        instance_annotation_resized = np.stack(
+            instance_annotation_resized, axis=0)
+        instance_annotation_resized = instance_annotation_resized.transpose(
+            1, 2, 0)
 
         # Resize Semantic Anntations
-        semantic_annotation = self.ann_resizer(Image.fromarray(semantic_annotation))
+        semantic_annotation = self.ann_resizer(
+            Image.fromarray(semantic_annotation))
         semantic_annotation = np.array(semantic_annotation)
 
         # Image Normalization
@@ -239,9 +246,10 @@ class AlignCollate(object):
 
         bs = len(images)
         for i in range(bs):
-            image, semantic_annotation, instance_annotation = self.__preprocess(images[i],
-                                                                                semantic_annotations[i],
-                                                                                instance_annotations[i])
+            image, semantic_annotation, instance_annotation = \
+                self.__preprocess(images[i],
+                                  semantic_annotations[i],
+                                  instance_annotations[i])
 
             images[i] = image
             semantic_annotations[i] = semantic_annotation
@@ -249,21 +257,25 @@ class AlignCollate(object):
 
         images = torch.stack(images)
 
-        instance_annotations = np.array(instance_annotations, dtype='int')  # bs, h, w, n_ins
+        instance_annotations = np.array(
+            instance_annotations,
+            dtype='int')  # bs, h, w, n_ins
 
-        semantic_annotations = np.array(semantic_annotations, dtype='int')  # bs, h, w
+        semantic_annotations = np.array(
+            semantic_annotations, dtype='int')  # bs, h, w
         semantic_annotations_one_hot = np.eye(self.n_classes, dtype='int')
         semantic_annotations_one_hot = \
-            semantic_annotations_one_hot[semantic_annotations.flatten()].reshape(semantic_annotations.shape[0],
-                                                                                 semantic_annotations.shape[1],
-                                                                                 semantic_annotations.shape[2],
-                                                                                 self.n_classes)
+            semantic_annotations_one_hot[semantic_annotations.flatten()].reshape(
+                semantic_annotations.shape[0], semantic_annotations.shape[1],
+                semantic_annotations.shape[2], self.n_classes)
 
         instance_annotations = torch.LongTensor(instance_annotations)
         instance_annotations = instance_annotations.permute(0, 3, 1, 2)
 
-        semantic_annotations_one_hot = torch.LongTensor(semantic_annotations_one_hot)
-        semantic_annotations_one_hot = semantic_annotations_one_hot.permute(0, 3, 1, 2)
+        semantic_annotations_one_hot = torch.LongTensor(
+            semantic_annotations_one_hot)
+        semantic_annotations_one_hot = semantic_annotations_one_hot.permute(
+            0, 3, 1, 2)
 
         n_objects = torch.IntTensor(n_objects)
 
