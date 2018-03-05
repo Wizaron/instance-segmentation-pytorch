@@ -2,10 +2,10 @@ import os, glob
 import numpy as np
 from PIL import Image
 
-DATA_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir, os.path.pardir))
-IMG_DIR = os.path.join(DATA_DIR, 'raw', 'CVPPP2017_LSC_training', 'training', 'A1')
+DATA_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir, os.path.pardir, os.path.pardir))
+IMG_DIR = os.path.join(DATA_DIR, 'raw', 'CVPPP', 'CVPPP2017_LSC_training', 'training', 'A1')
 
-image_list = np.loadtxt(os.path.join(DATA_DIR, 'metadata', 'training.lst'),
+image_list = np.loadtxt(os.path.join(DATA_DIR, 'metadata', 'CVPPP', 'training.lst'),
                         dtype='str', delimiter=',')
 
 reds, greens, blues = [], [], []

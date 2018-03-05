@@ -1,10 +1,28 @@
-data/processed/*/
-data/raw/*/
+data/metadata/*/number_of_instances.txt
+data/metadata/*/image_shapes.txt
+data/metadata/cityscapes/training.lst
+data/metadata/cityscapes/validation.lst
+data/processed/cityscapes/*/
+data/processed/CVPPP/*/
+data/raw/cityscapes/*/
+data/raw/CVPPP/*/
+data/raw/cityscapes/license.txt
 !data/processed/*.md
-!data/raw/*.md
-data/raw/*.zip
-models/*/
-outputs/*/
+!data/processed/cityscapes/*.md
+!data/processed/CVPPP/*.md
+!data/raw/cityscapes/*.md
+!data/raw/CVPPP/*.md
+data/raw/*/*.zip
+models/cityscapes/*/
+models/CVPPP/*/
+!models/cityscapes/*.md
+!models/CVPPP/*.md
+outputs/cityscapes/*/
+outputs/CVPPP/*/
+!outputs/cityscapes/*.md
+!outputs/CVPPP/*.md
+
+!*README*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

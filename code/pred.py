@@ -18,7 +18,12 @@ parser.add_argument('--output', required=True,
                     help='path of the output directory')
 parser.add_argument('--n_workers', default=1, type=int,
                     help='number of workers for clustering')
+parser.add_argument('--dataset', type=str,
+                    help='Name of the dataset: "cityscapes" or "CVPPP"',
+                    required=True)
 opt = parser.parse_args()
+
+assert opt.dataset in ['cityscapes', 'CVPPP']
 
 image_path = opt.image
 model_path = opt.model
@@ -33,11 +38,15 @@ model_dir = os.path.dirname(model_path)
 sys.path.insert(0, model_dir)
 
 from lib import Model, Prediction
-from settings import ModelSettings
 
-ms = ModelSettings()
+if opt.dataset == 'cityscapes':
+    from settings import CityscapesModelSettings
+    ms = CityscapesModelSettings()
+elif opt.dataset == 'CVPPP':
+    from settings import CVPPPModelSettings
+    ms = CVPPPModelSettings()
 
-model = Model(ms.MAX_N_OBJECTS,
+model = Model(opt.dataset, ms.N_CLASSES, ms.MAX_N_OBJECTS,
               use_instance_segmentation=ms.USE_INSTANCE_SEGMENTATION,
               use_coords=ms.USE_COORDINATES, load_model_path=opt.model,
               usegpu=opt.usegpu)

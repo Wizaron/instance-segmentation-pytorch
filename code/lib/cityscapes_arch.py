@@ -147,9 +147,10 @@ class BaseCNN(nn.Module):
 
 class Architecture(nn.Module):
 
-    def __init__(self, use_instance_seg, use_coords, usegpu=True):
+    def __init__(self, n_classes, use_instance_seg, use_coords, usegpu=True):
         super(Architecture, self).__init__()
 
+        self.n_classes = n_classes
         self.use_instance_seg = use_instance_seg
         self.use_coords = use_coords
 
@@ -164,8 +165,8 @@ class Architecture(nn.Module):
             stride=(2, 2))
         self.relu2 = nn.ReLU()
         # self.renet3 = ReNet(100 + self.cnn.n_filters[0], 50, usegpu=usegpu)
-        self.fg_seg_output = nn.Conv2d(
-            100 + self.cnn.n_filters[0], 2, kernel_size=(1, 1), stride=(1, 1))
+        self.sem_seg_output = nn.Conv2d(
+            100 + self.cnn.n_filters[0], self.n_classes, kernel_size=(1, 1), stride=(1, 1))
 
         if self.use_instance_seg:
             self.ins_seg_output = nn.Conv2d(
@@ -203,7 +204,7 @@ class Architecture(nn.Module):
         x_dec = self.relu2(self.upsampling2(x_dec))
         x_dec = torch.cat((x_dec, first_skip), dim=1)
         # x_dec = self.renet3(x_dec)
-        fg_seg_out = self.fg_seg_output(x_dec)
+        sem_seg_out = self.sem_seg_output(x_dec)
         if self.use_instance_seg:
             ins_seg_out = self.ins_seg_output(x_dec)
         else:
@@ -213,4 +214,4 @@ class Architecture(nn.Module):
         x_ins_cls = x_ins_cls.squeeze(3).squeeze(2)
         x_ins_cls = self.ins_cls_out(x_ins_cls)
 
-        return fg_seg_out, ins_seg_out, x_ins_cls
+        return sem_seg_out, ins_seg_out, x_ins_cls

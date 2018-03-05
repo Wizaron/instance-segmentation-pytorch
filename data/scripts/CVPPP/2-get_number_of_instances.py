@@ -2,9 +2,9 @@ import os, glob
 import numpy as np
 from PIL import Image
 
-DATA_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir, os.path.pardir))
-ANN_DIR = os.path.join(DATA_DIR, 'processed', 'annotations')
-OUTPUT_DIR = os.path.join(DATA_DIR, 'metadata')
+DATA_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir, os.path.pardir, os.path.pardir))
+ANN_DIR = os.path.join(DATA_DIR, 'processed', 'CVPPP', 'instance-annotations')
+OUTPUT_DIR = os.path.join(DATA_DIR, 'metadata', 'CVPPP')
 
 annotation_files = glob.glob(os.path.join(ANN_DIR, '*.npy'))
 
