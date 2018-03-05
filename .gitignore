@@ -24,6 +24,8 @@ outputs/CVPPP/*/
 
 !*README*
 
+data/raw/cityscapes/README
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
