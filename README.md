@@ -43,7 +43,7 @@ In prediction phase, network inputs an image and outputs a semantic segmentation
 		* **lib/losses/discriminative.py**: [Discriminative loss](https://arxiv.org/pdf/1708.02551.pdf) for instance segmentation.
 	* **settings**
 		* **settings/CVPPP/data_settings.py**, **settings/cityscapes/data_settings.py**: Defines settings about data.
-		* **settings/CVPPP/model_settings.py**, **settings/cityspcaes/model_settings.py**: Defines settings about model (hyper-parameters). 
+		* **settings/CVPPP/model_settings.py**, **settings/cityscapes/model_settings.py**: Defines settings about model (hyper-parameters). 
 		* **settings/CVPPP/training_settings.py**, **settings/cityscapes/training_settings.py**: Defines settings for training (optimization method, weight decay, augmentation, etc.).
 	* **train.py**: Training script.
 	* **pred.py**: Prediction script.
@@ -52,7 +52,7 @@ In prediction phase, network inputs an image and outputs a semantic segmentation
 	* **evaluate.py**: Evaluation script. Calculates SBD (symmetric best dice), |DiC| (absolute difference in count) and Foreground Dice (Dice score for semantic segmentation) as defined in the [paper](http://eprints.nottingham.ac.uk/34197/1/MVAP-D-15-00134_Revised_manuscript.pdf).
 * **data**:  Stores data and scripts to prepare dataset for training and evaluation.
 	* **metadata/CVPPP**, **metadata/cityscapes**: Stores metadata; such as, training, validation and test splits, image shapes etc.
-	* **processed/CVPPP**, **metadata/cityscapes**: Stores processed form of the data.
+	* **processed/CVPPP**, **processed/cityscapes**: Stores processed form of the data.
 	* **raw/CVPPP**, **raw/cityscapes**: Stores raw form of the data.
 	* **scripts**: Stores scripts to prepare dataset.
 		* **scripts/CVPPP**: For CVPPP dataset.
