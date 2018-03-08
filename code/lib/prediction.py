@@ -48,13 +48,13 @@ class Prediction(object):
         return cv2.resize(prediction, (image_width, image_height),
                           interpolation=cv2.INTER_NEAREST)
 
-    def cluster(self, fg_seg_prediction, ins_seg_prediction,
+    def cluster(self, sem_seg_prediction, ins_seg_prediction,
                 n_objects_prediction):
 
         seg_height, seg_width = ins_seg_prediction.shape[1:]
 
-        fg_seg_prediction = fg_seg_prediction.cpu().numpy()
-        fg_seg_prediction = fg_seg_prediction.argmax(0).astype(np.uint8)
+        sem_seg_prediction = sem_seg_prediction.cpu().numpy()
+        sem_seg_prediction = sem_seg_prediction.argmax(0).astype(np.uint8)
 
         embeddings = ImageUtilities.coordinate_adder(
             seg_height, seg_width)(ins_seg_prediction)
@@ -63,7 +63,7 @@ class Prediction(object):
 
         n_objects_prediction = n_objects_prediction.cpu().numpy()[0]
 
-        embeddings = np.stack([embeddings[:, :, i][fg_seg_prediction == 1]
+        embeddings = np.stack([embeddings[:, :, i][sem_seg_prediction != 0]
                                for i in range(embeddings.shape[2])], axis=1)
 
         clustering = SpectralClustering(n_clusters=n_objects_prediction,
@@ -79,39 +79,39 @@ class Prediction(object):
 
         instance_mask = np.zeros((seg_height, seg_width), dtype=np.uint8)
 
-        fg_coords = np.where(fg_seg_prediction == 1)
+        fg_coords = np.where(sem_seg_prediction != 0)
         for si in range(len(fg_coords[0])):
             y_coord = fg_coords[0][si]
             x_coord = fg_coords[1][si]
             _label = labels[si] + 1
             instance_mask[y_coord, x_coord] = _label
 
-        return fg_seg_prediction, instance_mask, n_objects_prediction
+        return sem_seg_prediction, instance_mask, n_objects_prediction
 
     def predict(self, image_path):
 
         image, image_height, image_width = self.get_image(image_path)
         image = image.unsqueeze(0)
 
-        fg_seg_prediction, ins_seg_prediction, n_objects_prediction = \
+        sem_seg_prediction, ins_seg_prediction, n_objects_prediction = \
             self.model.predict(image)
 
-        fg_seg_prediction = fg_seg_prediction.squeeze(0)
+        sem_seg_prediction = sem_seg_prediction.squeeze(0)
         ins_seg_prediction = ins_seg_prediction.squeeze(0)
         n_objects_prediction = n_objects_prediction.squeeze(0)
 
-        fg_seg_prediction, ins_seg_prediction, \
-            n_objects_prediction = self.cluster(fg_seg_prediction,
+        sem_seg_prediction, ins_seg_prediction, \
+            n_objects_prediction = self.cluster(sem_seg_prediction,
                                                 ins_seg_prediction,
                                                 n_objects_prediction)
 
-        fg_seg_prediction = self.upsample_prediction(
-            fg_seg_prediction, image_height, image_width)
+        sem_seg_prediction = self.upsample_prediction(
+            sem_seg_prediction, image_height, image_width)
         ins_seg_prediction = self.upsample_prediction(
             ins_seg_prediction, image_height, image_width)
 
         raw_image_pil = ImageUtilities.read_image(image_path)
         raw_image = np.array(raw_image_pil)
 
-        return raw_image, fg_seg_prediction, ins_seg_prediction, \
+        return raw_image, sem_seg_prediction, ins_seg_prediction, \
             n_objects_prediction

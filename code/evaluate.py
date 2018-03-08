@@ -4,8 +4,13 @@ from PIL import Image
 import os
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--pred_dir', required=True, help='prediction directory')
+parser.add_argument('--pred_dir', required=True, help='Prediction directory')
+parser.add_argument('--dataset', type=str,
+                    help='Name of the dataset: "cityscapes" or "CVPPP"',
+                    required=True)
 opt = parser.parse_args()
+
+assert opt.dataset in ['cityscapes', 'CVPPP']
 
 pred_dir = opt.pred_dir
 
@@ -52,47 +57,58 @@ def calc_sbd(ins_seg_gt, ins_seg_pred):
     return min(_dice1, _dice2)
 
 
-names = np.loadtxt('../data/metadata/validation.lst',
-                   dtype='str', delimiter=',')
-n_objects_gts = np.loadtxt(
-    '../data/metadata/number_of_instances.txt', dtype='str', delimiter=',')
-img_dir = '../data/raw/CVPPP2017_LSC_training/training/A1'
+if opt.dataset == 'CVPPP':
+    names = np.loadtxt('../data/metadata/CVPPP/validation_image_paths.txt',
+                       dtype='str', delimiter=',')
+    names = np.array([os.path.splitext(os.path.basename(n))[0] for n in names])
+    n_objects_gts = np.loadtxt(
+        '../data/metadata/CVPPP/number_of_instances.txt',
+        dtype='str',
+        delimiter=',')
+    img_dir = '../data/raw/CVPPP/CVPPP2017_LSC_training/training/A1'
 
-dics, sbds, fg_dices = [], [], []
-for name in names:
-    if not os.path.isfile(
-            '{}/{}/{}_rgb-n_objects.npy'.format(pred_dir, name, name)):
-        continue
+    dics, sbds, fg_dices = [], [], []
+    for name in names:
+        if not os.path.isfile(
+                '{}/{}/{}-n_objects.npy'.format(pred_dir, name, name)):
+            continue
 
-    n_objects_gt = int(n_objects_gts[n_objects_gts[:, 0] == name][0][1])
-    n_objects_pred = np.load(
-        '{}/{}/{}_rgb-n_objects.npy'.format(pred_dir, name, name))
+        n_objects_gt = int(n_objects_gts[n_objects_gts[:, 0] == name.replace('_rgb', '')][0][1])
+        n_objects_pred = np.load(
+            '{}/{}/{}-n_objects.npy'.format(pred_dir, name, name))
 
-    ins_seg_gt = np.array(Image.open(
-        os.path.join(img_dir, name + '_label.png')))
-    ins_seg_pred = np.array(Image.open(os.path.join(
-        pred_dir, name, name + '_rgb-ins_mask.png')))
+        ins_seg_gt = np.array(Image.open(
+            os.path.join(img_dir, name.replace('_rgb', '') + '_label.png')))
+        ins_seg_pred = np.array(Image.open(os.path.join(
+            pred_dir, name, name + '-ins_mask.png')))
 
-    fg_seg_gt = np.array(Image.open(os.path.join(img_dir, name + '_fg.png')))
-    fg_seg_pred = np.array(Image.open(os.path.join(
-        pred_dir, name, name + '_rgb-fg_mask.png')))
+        fg_seg_gt = np.array(
+            Image.open(
+                os.path.join(
+                    img_dir,
+                    name.replace('_rgb', '') +
+                    '_fg.png')))
+        fg_seg_pred = np.array(Image.open(os.path.join(
+            pred_dir, name, name + '-fg_mask.png')))
 
-    fg_seg_gt = (fg_seg_gt == 1).astype('bool')
-    fg_seg_pred = (fg_seg_pred == 255).astype('bool')
+        fg_seg_gt = (fg_seg_gt == 1).astype('bool')
+        fg_seg_pred = (fg_seg_pred == 255).astype('bool')
 
-    sbd = calc_sbd(ins_seg_gt, ins_seg_pred)
-    sbds.append(sbd)
+        sbd = calc_sbd(ins_seg_gt, ins_seg_pred)
+        sbds.append(sbd)
 
-    dic = calc_dic(n_objects_gt, n_objects_pred)
-    dics.append(dic)
+        dic = calc_dic(n_objects_gt, n_objects_pred)
+        dics.append(dic)
 
-    fg_dice = calc_dice(fg_seg_gt, fg_seg_pred)
-    fg_dices.append(fg_dice)
+        fg_dice = calc_dice(fg_seg_gt, fg_seg_pred)
+        fg_dices.append(fg_dice)
 
-mean_dic = np.mean(dics)
-mean_sbd = np.mean(sbds)
-mean_fg_dice = np.mean(fg_dices)
+    mean_dic = np.mean(dics)
+    mean_sbd = np.mean(sbds)
+    mean_fg_dice = np.mean(fg_dices)
 
-print 'MEAN SBD     : ', mean_sbd
-print 'MEAN |DIC|   : ', mean_dic
-print 'MEAN FG DICE : ', mean_fg_dice
+    print 'MEAN SBD     : ', mean_sbd
+    print 'MEAN |DIC|   : ', mean_dic
+    print 'MEAN FG DICE : ', mean_fg_dice
+elif opt.dataset == 'cityscapes':
+    NotImplementedError()

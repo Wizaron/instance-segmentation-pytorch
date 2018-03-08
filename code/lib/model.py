@@ -10,24 +10,45 @@ import torch.backends.cudnn as cudnn
 import numpy as np
 from itertools import ifilter
 
-from arch import Architecture
+from cvppp_arch import Architecture as CVPPPArchitecture
+from cityscapes_arch import Architecture as CityscapesArchitecture
 from losses import DiceLoss, DiceCoefficient, DiscriminativeLoss
 
 
 class Model(object):
 
-    def __init__(self, max_n_objects, use_instance_segmentation=False,
-                 use_coords=False, load_model_path='', usegpu=True):
+    def __init__(
+            self,
+            dataset,
+            n_classes,
+            max_n_objects,
+            use_instance_segmentation=False,
+            use_coords=False,
+            load_model_path='',
+            usegpu=True):
 
+        self.dataset = dataset
+        self.n_classes = n_classes
         self.max_n_objects = max_n_objects
         self.use_instance_segmentation = use_instance_segmentation
         self.use_coords = use_coords
         self.load_model_path = load_model_path
         self.usegpu = usegpu
 
-        self.model = Architecture(
-            self.use_instance_segmentation, self.use_coords,
-            usegpu=self.usegpu)
+        assert self.dataset in ['CVPPP', 'cityscapes']
+
+        if self.dataset == 'CVPPP':
+            self.model = CVPPPArchitecture(
+                self.n_classes,
+                self.use_instance_segmentation,
+                self.use_coords,
+                usegpu=self.usegpu)
+        elif self.dataset == 'cityscapes':
+            self.model = CityscapesArchitecture(
+                self.n_classes,
+                self.use_instance_segmentation,
+                self.use_coords,
+                usegpu=self.usegpu)
 
         self.__load_weights()
 
@@ -170,33 +191,33 @@ class Model(object):
                 param.requires_grad = False
             self.model.eval()
 
-        cpu_images, cpu_fg_seg_annotations, \
+        cpu_images, cpu_sem_seg_annotations, \
             cpu_ins_seg_annotations, cpu_n_objects = train_test_iter.next()
         cpu_images = cpu_images.contiguous()
-        cpu_fg_seg_annotations = cpu_fg_seg_annotations.contiguous()
+        cpu_sem_seg_annotations = cpu_sem_seg_annotations.contiguous()
         cpu_ins_seg_annotations = cpu_ins_seg_annotations.contiguous()
         cpu_n_objects = cpu_n_objects.contiguous()
 
         if self.usegpu:
             gpu_images = cpu_images.cuda(async=True)
-            gpu_fg_seg_annotations = cpu_fg_seg_annotations.cuda(async=True)
+            gpu_sem_seg_annotations = cpu_sem_seg_annotations.cuda(async=True)
             gpu_ins_seg_annotations = cpu_ins_seg_annotations.cuda(async=True)
             gpu_n_objects = cpu_n_objects.cuda(async=True)
         else:
             gpu_images = cpu_images
-            gpu_fg_seg_annotations = cpu_fg_seg_annotations
+            gpu_sem_seg_annotations = cpu_sem_seg_annotations
             gpu_ins_seg_annotations = cpu_ins_seg_annotations
             gpu_n_objects = cpu_n_objects
 
-        gpu_images, gpu_fg_seg_annotations, \
+        gpu_images, gpu_sem_seg_annotations, \
             gpu_ins_seg_annotations, gpu_n_objects = \
             self.__define_input_variables(gpu_images,
-                                          gpu_fg_seg_annotations,
+                                          gpu_sem_seg_annotations,
                                           gpu_ins_seg_annotations,
                                           gpu_n_objects, mode)
         gpu_n_objects_normalized = gpu_n_objects.float() / self.max_n_objects
 
-        fg_seg_predictions, ins_seg_predictions, \
+        sem_seg_predictions, ins_seg_predictions, \
             n_objects_predictions = self.model(gpu_images)
 
         if mode == 'test':
@@ -204,19 +225,19 @@ class Model(object):
                 _vis_prob = np.random.rand()
                 if _vis_prob > 0.7:
                     if self.use_instance_segmentation:
-                        fg_preds = np.argmax(
-                            fg_seg_predictions.data.cpu().numpy(), axis=1)
+                        sem_seg_preds = np.argmax(
+                            sem_seg_predictions.data.cpu().numpy(), axis=1)
                         seg_preds = ins_seg_predictions.data.cpu().numpy()
 
                         _bs, _n_feats = seg_preds.shape[:2]
 
                         _sample_idx = np.random.randint(_bs)
-                        _fg_preds_sample = fg_preds[_sample_idx]
+                        _sem_seg_preds_sample = sem_seg_preds[_sample_idx]
                         _seg_preds_sample = seg_preds[_sample_idx]
 
                         fg_ins_embeddings = np.stack(
                             [_seg_preds_sample[i][np.where(
-                                _fg_preds_sample == 1)]
+                                _sem_seg_preds_sample == 1)]
                                 for i in range(_n_feats)], axis=1)
                         _n_fg_samples = fg_ins_embeddings.shape[0]
                         if _n_fg_samples > 0:
@@ -257,17 +278,17 @@ class Model(object):
             out_metrics['Discriminative Cost'] = disc_cost.data
 
         if criterion_type in ['CE', 'Multi']:
-            _, gpu_fg_seg_annotations_criterion_ce = \
-                gpu_fg_seg_annotations.max(1)
+            _, gpu_sem_seg_annotations_criterion_ce = \
+                gpu_sem_seg_annotations.max(1)
             ce_cost = self.criterion_ce(
-                fg_seg_predictions.permute(0, 2,
-                                           3, 1).contiguous().view(-1, 2),
-                gpu_fg_seg_annotations_criterion_ce.view(-1))
+                sem_seg_predictions.permute(0, 2, 3, 1).contiguous().view(
+                    -1, self.n_classes),
+                gpu_sem_seg_annotations_criterion_ce.view(-1))
             cost += ce_cost
             out_metrics['CE Cost'] = ce_cost.data
         if criterion_type in ['Dice', 'Multi']:
             dice_cost = self.criterion_dice(
-                fg_seg_predictions, gpu_fg_seg_annotations)
+                sem_seg_predictions, gpu_sem_seg_annotations)
             cost += dice_cost
             out_metrics['Dice Cost'] = dice_cost.data
 
@@ -457,20 +478,20 @@ class Model(object):
 
         images = self.__define_variable(images, volatile=True)
 
-        fg_seg_predictions, ins_seg_predictions, n_objects_predictions = \
+        sem_seg_predictions, ins_seg_predictions, n_objects_predictions = \
             self.model(images)
 
-        fg_seg_predictions = torch.nn.functional.softmax(
-            fg_seg_predictions, dim=1)
+        sem_seg_predictions = torch.nn.functional.softmax(
+            sem_seg_predictions, dim=1)
 
         n_objects_predictions = n_objects_predictions * self.max_n_objects
         n_objects_predictions = torch.round(n_objects_predictions).int()
 
-        fg_seg_predictions = fg_seg_predictions.data.cpu()
+        sem_seg_predictions = sem_seg_predictions.data.cpu()
         ins_seg_predictions = ins_seg_predictions.data.cpu()
         n_objects_predictions = n_objects_predictions.data.cpu()
 
-        return fg_seg_predictions, ins_seg_predictions, n_objects_predictions
+        return sem_seg_predictions, ins_seg_predictions, n_objects_predictions
 
 
 class averager(object):

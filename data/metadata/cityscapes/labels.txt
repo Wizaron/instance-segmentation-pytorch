@@ -1,0 +1,8 @@
+24,person,1
+25,rider,2
+26,car,3
+27,truck,4
+28,bus,5
+31,train,6
+32,motorcycle,7
+33,bicycle,8
