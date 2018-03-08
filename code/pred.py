@@ -10,14 +10,14 @@ from PIL import Image
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--image', required=True, help='path of the image')
-parser.add_argument('--model', required=True, help='path of the model')
+parser.add_argument('--image', required=True, help='Path of the image')
+parser.add_argument('--model', required=True, help='Path of the model')
 parser.add_argument('--usegpu', action='store_true',
-                    help='enables cuda to predict on gpu')
+                    help='Enables cuda to predict on gpu')
 parser.add_argument('--output', required=True,
-                    help='path of the output directory')
+                    help='Path of the output directory')
 parser.add_argument('--n_workers', default=1, type=int,
-                    help='number of workers for clustering')
+                    help='Number of workers for clustering')
 parser.add_argument('--dataset', type=str,
                     help='Name of the dataset: "cityscapes" or "CVPPP"',
                     required=True)

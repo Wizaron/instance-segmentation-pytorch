@@ -1,5 +1,6 @@
 data/metadata/*/number_of_instances.txt
 data/metadata/*/image_shapes.txt
+data/metadata/*/*image_paths.txt
 data/metadata/cityscapes/training.lst
 data/metadata/cityscapes/validation.lst
 data/processed/cityscapes/*/

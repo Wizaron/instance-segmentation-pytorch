@@ -4,7 +4,7 @@ from PIL import Image
 import os
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--pred_dir', required=True, help='prediction directory')
+parser.add_argument('--pred_dir', required=True, help='Prediction directory')
 parser.add_argument('--dataset', type=str,
                     help='Name of the dataset: "cityscapes" or "CVPPP"',
                     required=True)
@@ -58,8 +58,9 @@ def calc_sbd(ins_seg_gt, ins_seg_pred):
 
 
 if opt.dataset == 'CVPPP':
-    names = np.loadtxt('../data/metadata/CVPPP/validation.lst',
+    names = np.loadtxt('../data/metadata/CVPPP/validation_image_paths.txt',
                        dtype='str', delimiter=',')
+    names = np.array([os.path.splitext(os.path.basename(n))[0] for n in names])
     n_objects_gts = np.loadtxt(
         '../data/metadata/CVPPP/number_of_instances.txt',
         dtype='str',
@@ -69,26 +70,26 @@ if opt.dataset == 'CVPPP':
     dics, sbds, fg_dices = [], [], []
     for name in names:
         if not os.path.isfile(
-                '{}/{}/{}_rgb-n_objects.npy'.format(pred_dir, name, name)):
+                '{}/{}/{}-n_objects.npy'.format(pred_dir, name, name)):
             continue
 
-        n_objects_gt = int(n_objects_gts[n_objects_gts[:, 0] == name][0][1])
+        n_objects_gt = int(n_objects_gts[n_objects_gts[:, 0] == name.replace('_rgb', '')][0][1])
         n_objects_pred = np.load(
-            '{}/{}/{}_rgb-n_objects.npy'.format(pred_dir, name, name))
+            '{}/{}/{}-n_objects.npy'.format(pred_dir, name, name))
 
         ins_seg_gt = np.array(Image.open(
-            os.path.join(img_dir, name + '_label.png')))
+            os.path.join(img_dir, name.replace('_rgb', '') + '_label.png')))
         ins_seg_pred = np.array(Image.open(os.path.join(
-            pred_dir, name, name + '_rgb-ins_mask.png')))
+            pred_dir, name, name + '-ins_mask.png')))
 
         fg_seg_gt = np.array(
             Image.open(
                 os.path.join(
                     img_dir,
-                    name +
+                    name.replace('_rgb', '') +
                     '_fg.png')))
         fg_seg_pred = np.array(Image.open(os.path.join(
-            pred_dir, name, name + '_rgb-fg_mask.png')))
+            pred_dir, name, name + '-fg_mask.png')))
 
         fg_seg_gt = (fg_seg_gt == 1).astype('bool')
         fg_seg_pred = (fg_seg_pred == 255).astype('bool')
