@@ -37,5 +37,6 @@ red_std = np.std(reds) / 255.
 green_std = np.std(greens) / 255.
 blue_std = np.std(blues) / 255.
 
-print red_mean, green_mean, blue_mean
-print red_std, green_std, blue_std
+with open(os.path.join(DATA_DIR, 'metadata', 'CVPPP', 'means_and_stds.txt'), 'w') as fp:
+    fp.write('RGB MEANS : {} {} {}\n'.format(red_mean, green_mean, blue_mean))
+    fp.write('RGB STDS  : {} {} {}\n'.format(red_std, green_std, blue_std))
