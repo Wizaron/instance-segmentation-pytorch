@@ -25,16 +25,13 @@ parser.add_argument('--nworkers', type=int,
                         (0 to do it using main process) [Default : 2]',
                     default=2)
 parser.add_argument('--dataset', type=str,
-                    help='Name of the dataset: "cityscapes" or "CVPPP"',
+                    help='Name of the dataset which is "CVPPP"',
                     required=True)
 opt = parser.parse_args()
 
-assert opt.dataset in ['cityscapes', 'CVPPP']
+assert opt.dataset in ['CVPPP', ]
 
-if opt.dataset == 'cityscapes':
-    from settings import CityscapesTrainingSettings
-    ts = CityscapesTrainingSettings()
-elif opt.dataset == 'CVPPP':
+if opt.dataset == 'CVPPP':
     from settings import CVPPPTrainingSettings
     ts = CVPPPTrainingSettings()
 

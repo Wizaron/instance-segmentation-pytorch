@@ -17,11 +17,11 @@ parser.add_argument('--usegpu', action='store_true',
 parser.add_argument('--n_workers', default=1, type=int,
                     help='Number of workers for clustering')
 parser.add_argument('--dataset', type=str,
-                    help='Name of the dataset: "cityscapes" or "CVPPP"',
+                    help='Name of the dataset which is "CVPPP"',
                     required=True)
 opt = parser.parse_args()
 
-assert opt.dataset in ['cityscapes', 'CVPPP']
+assert opt.dataset in ['CVPPP', ]
 
 images_list = np.loadtxt(opt.lst, dtype='str', delimiter=',')
 model_path = opt.model
@@ -47,10 +47,7 @@ sys.path.insert(0, model_dir)
 
 from lib import Model, Prediction
 
-if opt.dataset == 'cityscapes':
-    from settings import CityscapesModelSettings
-    ms = CityscapesModelSettings()
-elif opt.dataset == 'CVPPP':
+if opt.dataset == 'CVPPP':
     from settings import CVPPPModelSettings
     ms = CVPPPModelSettings()
 

@@ -6,11 +6,11 @@ import os
 parser = argparse.ArgumentParser()
 parser.add_argument('--pred_dir', required=True, help='Prediction directory')
 parser.add_argument('--dataset', type=str,
-                    help='Name of the dataset: "cityscapes" or "CVPPP"',
+                    help='Name of the dataset which is "CVPPP"',
                     required=True)
 opt = parser.parse_args()
 
-assert opt.dataset in ['cityscapes', 'CVPPP']
+assert opt.dataset in ['CVPPP', ]
 
 pred_dir = opt.pred_dir
 
@@ -110,5 +110,3 @@ if opt.dataset == 'CVPPP':
     print 'MEAN SBD     : ', mean_sbd
     print 'MEAN |DIC|   : ', mean_dic
     print 'MEAN FG DICE : ', mean_fg_dice
-elif opt.dataset == 'cityscapes':
-    NotImplementedError()

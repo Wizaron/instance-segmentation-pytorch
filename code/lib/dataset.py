@@ -284,7 +284,7 @@ class AlignCollate(object):
 
 
 if __name__ == '__main__':
-    ds = SegDataset('../../data/processed/cityscapes/lmdb/training-lmdb/')
+    ds = SegDataset('../../data/processed/CVPPP/lmdb/training-lmdb/')
     image, semantic_annotation, instance_annotation, n_objects = ds[5]
 
     print image.size

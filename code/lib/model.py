@@ -11,7 +11,6 @@ import numpy as np
 from itertools import ifilter
 
 from cvppp_arch import Architecture as CVPPPArchitecture
-from cityscapes_arch import Architecture as CityscapesArchitecture
 from losses import DiceLoss, DiceCoefficient, DiscriminativeLoss
 
 
@@ -35,16 +34,10 @@ class Model(object):
         self.load_model_path = load_model_path
         self.usegpu = usegpu
 
-        assert self.dataset in ['CVPPP', 'cityscapes']
+        assert self.dataset in ['CVPPP', ]
 
         if self.dataset == 'CVPPP':
             self.model = CVPPPArchitecture(
-                self.n_classes,
-                self.use_instance_segmentation,
-                self.use_coords,
-                usegpu=self.usegpu)
-        elif self.dataset == 'cityscapes':
-            self.model = CityscapesArchitecture(
                 self.n_classes,
                 self.use_instance_segmentation,
                 self.use_coords,
