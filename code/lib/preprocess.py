@@ -444,11 +444,11 @@ class AddCoordinates(object):
 
     def __call__(self, image):
 
-        x_coords = 2.0 * torch.arange(self.image_height).unsqueeze(
-            1).expand(self.image_height, self.image_width) / 255.0 - 1.0
-        y_coords = 2.0 * torch.arange(self.image_width).unsqueeze(
-            0).expand(self.image_height, self.image_width) / 255.0 - 1.0
-        coords = torch.stack((x_coords, y_coords), dim=0)
+        y_coords = 2.0 * torch.arange(self.image_height).unsqueeze(
+            1).expand(self.image_height, self.image_width) / (self.image_height - 1.0) - 1.0
+        x_coords = 2.0 * torch.arange(self.image_width).unsqueeze(
+            0).expand(self.image_height, self.image_width) / (self.image_width - 1.0) - 1.0
+        coords = torch.stack((y_coords, x_coords), dim=0)
 
         image = torch.cat((coords, image), dim=0)
 
