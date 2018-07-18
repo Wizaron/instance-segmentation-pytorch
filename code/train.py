@@ -90,10 +90,14 @@ train_align_collate = AlignCollate(
     ts.IMAGE_WIDTH,
     random_hor_flipping=ts.HORIZONTAL_FLIPPING,
     random_ver_flipping=ts.VERTICAL_FLIPPING,
+    random_transposing=ts.TRANSPOSING,
     random_90x_rotation=ts.ROTATION_90X,
     random_rotation=ts.ROTATION,
     random_color_jittering=ts.COLOR_JITTERING,
-    use_coordinates=ts.USE_COORDINATES)
+    random_grayscaling=ts.GRAYSCALING,
+    random_channel_swapping=ts.CHANNEL_SWAPPING,
+    random_gamma=ts.GAMMA_ADJUSTMENT,
+    random_resolution=ts.RESOLUTION_DEGRADING)
 
 train_loader = torch.utils.data.DataLoader(train_dataset,
                                            batch_size=opt.batchsize,
@@ -115,10 +119,14 @@ test_align_collate = AlignCollate(
     ts.IMAGE_WIDTH,
     random_hor_flipping=ts.HORIZONTAL_FLIPPING,
     random_ver_flipping=ts.VERTICAL_FLIPPING,
+    random_transposing=ts.TRANSPOSING,
     random_90x_rotation=ts.ROTATION_90X,
     random_rotation=ts.ROTATION,
     random_color_jittering=ts.COLOR_JITTERING,
-    use_coordinates=ts.USE_COORDINATES)
+    random_grayscaling=ts.GRAYSCALING,
+    random_channel_swapping=ts.CHANNEL_SWAPPING,
+    random_gamma=ts.GAMMA_ADJUSTMENT,
+    random_resolution=ts.RESOLUTION_DEGRADING)
 
 test_loader = torch.utils.data.DataLoader(test_dataset,
                                           batch_size=opt.batchsize,
@@ -128,7 +136,7 @@ test_loader = torch.utils.data.DataLoader(test_dataset,
                                           collate_fn=test_align_collate)
 
 # Define Model
-model = Model(opt.dataset, ts.N_CLASSES, ts.MAX_N_OBJECTS,
+model = Model(opt.dataset, ts.MODEL_NAME, ts.N_CLASSES, ts.MAX_N_OBJECTS,
               use_instance_segmentation=ts.USE_INSTANCE_SEGMENTATION,
               use_coords=ts.USE_COORDINATES, load_model_path=opt.model,
               usegpu=opt.usegpu)

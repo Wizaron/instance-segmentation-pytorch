@@ -43,7 +43,7 @@ if opt.dataset == 'CVPPP':
     from settings import CVPPPModelSettings
     ms = CVPPPModelSettings()
 
-model = Model(opt.dataset, ms.N_CLASSES, ms.MAX_N_OBJECTS,
+model = Model(opt.dataset, ms.MODEL_NAME, ms.N_CLASSES, ms.MAX_N_OBJECTS,
               use_instance_segmentation=ms.USE_INSTANCE_SEGMENTATION,
               use_coords=ms.USE_COORDINATES, load_model_path=opt.model,
               usegpu=opt.usegpu)
