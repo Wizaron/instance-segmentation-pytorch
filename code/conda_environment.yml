@@ -49,6 +49,7 @@ dependencies:
   - matplotlib=2.1.2=py27h0e671d2_0
   - mkl=2018.0.1=h19d6760_4
   - ncurses=6.0=h9df7e31_2
+  - ninja=1.8.2=py27h6bb024c_1
   - numpy=1.13.3=py27hbcc08e0_0
   - olefile=0.44=py27h4bd3e3c_0
   - opencv=3.3.1=py27h6cbbc71_1
@@ -89,8 +90,8 @@ dependencies:
   - wheel=0.30.0=py27h2bc6bb2_1
   - xz=5.2.3=h55aa19d_2
   - zlib=1.2.11=ha838bed_2
-  - pytorch=0.3.0=py27_cuda8.0.61_cudnn7.0.3hf383a3f_4
-  - torchvision=0.2.0=py27hfb27419_1
+  - pytorch=0.4.0=py27_cuda8.0.61_cudnn7.1.2_1
+  - torchvision=0.2.1=py27_1
   - pip:
     - backports.ssl-match-hostname==3.5.0.1
     - chardet==3.0.4
@@ -104,10 +105,11 @@ dependencies:
     - pylibdmtx==0.1.7
     - pyyaml==3.12
     - pyzmq==16.0.4
+    - regex==2018.7.11
     - requests==2.18.4
     - ruamel.ordereddict==0.4.13
     - ruamel.yaml==0.15.26
-    - torch==0.3.0.post4
+    - torch==0.4.0
     - torchfile==0.1.0
     - tzlocal==1.4
     - umalqurra==0.2
