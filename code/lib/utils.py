@@ -1,18 +1,20 @@
 from PIL import Image
 import torchvision.transforms as transforms
-import torch
-from torch.autograd import Variable
+from StringIO import StringIO
 
 from preprocess import RandomResizedCrop, RandomHorizontalFlip, \
-    RandomVerticalFlip, RandomTranspose, RandomRotation90x, \
-    RandomRotation, AddCoordinates
+    RandomVerticalFlip, RandomTranspose, RandomRotate, \
+    RandomChannelSwap, RandomGamma, RandomResolution
 
 
 class ImageUtilities(object):
 
     @staticmethod
-    def read_image(image_path):
-        img = Image.open(image_path)
+    def read_image(image_path, is_raw=False):
+        if is_raw:
+            img = Image.open(StringIO(image_path))
+        else:
+            img = Image.open(image_path).convert('RGB')
         img_copy = img.copy()
         img.close()
         return img_copy
@@ -22,8 +24,7 @@ class ImageUtilities(object):
         return transforms.Resize((height, width), interpolation=interpolation)
 
     @staticmethod
-    def image_random_cropper_and_resizer(
-            height, width, interpolation=Image.BILINEAR):
+    def image_random_cropper_and_resizer(height, width, interpolation=Image.BILINEAR):
         return RandomResizedCrop(height, width, interpolation=interpolation)
 
     @staticmethod
@@ -39,27 +40,33 @@ class ImageUtilities(object):
         return RandomTranspose()
 
     @staticmethod
-    def image_random_90x_rotator():
-        return RandomRotation90x()
-
-    @staticmethod
-    def image_random_rotator(expand=False, center=None):
-        return RandomRotation(expand=expand, center=center)
-
-    @staticmethod
-    def image_random_color_jitter(
-            brightness=0, contrast=0, saturation=0, hue=0):
-        return transforms.ColorJitter(brightness, contrast, saturation, hue)
-
-    @staticmethod
-    def image_random_grayscaler(prob=0.5):
-        return transforms.RandomGrayscale(p=prob)
-
-    @staticmethod
     def image_normalizer(mean, std):
-        return transforms.Compose(
-            [transforms.ToTensor(), transforms.Normalize(mean=mean, std=std)])
+        return transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=mean, std=std)])
 
     @staticmethod
-    def coordinate_adder(height, width):
-        return AddCoordinates(height, width)
+    def image_random_rotator(interpolation=Image.BILINEAR, random_bg=True):
+        return RandomRotate(interpolation=interpolation, random_bg=random_bg)
+
+    @staticmethod
+    def image_random_90x_rotator(interpolation=Image.BILINEAR):
+        return RandomRotate(interpolation=interpolation, random_bg=False)
+
+    @staticmethod
+    def image_random_color_jitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2):
+        return transforms.ColorJitter(brightness=brightness, contrast=contrast, saturation=saturation, hue=hue)
+
+    @staticmethod
+    def image_random_grayscaler(p=0.5):
+        return transforms.RandomGrayscale(p=p)
+
+    @staticmethod
+    def image_random_channel_swapper(p=0.5):
+        return RandomChannelSwap(prob=p)
+
+    @staticmethod
+    def image_random_gamma(gamma_range, gain=1):
+        return RandomGamma(gamma_range, gain=gain)
+
+    @staticmethod
+    def image_random_resolution(ratio_range):
+        return RandomResolution(ratio_range)

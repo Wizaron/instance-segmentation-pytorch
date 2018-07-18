@@ -10,23 +10,19 @@ import torch.backends.cudnn as cudnn
 import numpy as np
 from itertools import ifilter
 
-from cvppp_arch import Architecture as CVPPPArchitecture
+from archs import ReSeg
+from archs import StackedRecurrentHourglass as SRecHg
 from losses import DiceLoss, DiceCoefficient, DiscriminativeLoss
 
 
 class Model(object):
 
-    def __init__(
-            self,
-            dataset,
-            n_classes,
-            max_n_objects,
-            use_instance_segmentation=False,
-            use_coords=False,
-            load_model_path='',
-            usegpu=True):
+    def __init__(self, dataset, model_name, n_classes, max_n_objects,
+                 use_instance_segmentation=False, use_coords=False,
+                 load_model_path='', usegpu=True):
 
         self.dataset = dataset
+        self.model_name = model_name
         self.n_classes = n_classes
         self.max_n_objects = max_n_objects
         self.use_instance_segmentation = use_instance_segmentation
@@ -35,13 +31,21 @@ class Model(object):
         self.usegpu = usegpu
 
         assert self.dataset in ['CVPPP', ]
+        assert self.model_name in ['ReSeg', 'StackedRecurrentHourglass']
 
         if self.dataset == 'CVPPP':
-            self.model = CVPPPArchitecture(
-                self.n_classes,
-                self.use_instance_segmentation,
-                self.use_coords,
-                usegpu=self.usegpu)
+            if self.model_name == 'ReSeg':
+                self.model = ReSeg(self.n_classes,
+                                   self.use_instance_segmentation,
+                                   pretrained=True,
+                                   use_coordinates=self.use_coords,
+                                   usegpu=self.usegpu)
+            elif self.model_name == 'StackedRecurrentHourglass':
+                self.model = SRecHg(self.n_classes,
+                                    self.use_instance_segmentation,
+                                    self.use_coords,
+                                    pretrained=True,
+                                    usegpu=self.usegpu)
 
         self.__load_weights()
 
@@ -208,6 +212,9 @@ class Model(object):
                                           gpu_sem_seg_annotations,
                                           gpu_ins_seg_annotations,
                                           gpu_n_objects, mode)
+
+        gpu_n_objects = gpu_n_objects.unsqueeze(dim=1)
+
         gpu_n_objects_normalized = gpu_n_objects.float() / self.max_n_objects
 
         sem_seg_predictions, ins_seg_predictions, \

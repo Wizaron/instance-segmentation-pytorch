@@ -29,7 +29,7 @@ def calculate_means(pred, gt, n_objects, max_n_objects, usegpu):
         _mean_sample = _pred_masked_sample.sum(
             0) / _gt_expanded_sample.sum(0)  # n_objects, n_filters
         if (max_n_objects - _n_objects_sample) != 0:
-            n_fill_objects = max_n_objects - _n_objects_sample
+            n_fill_objects = int(max_n_objects - _n_objects_sample)
             _fill_sample = torch.zeros(n_fill_objects, n_filters)
             if usegpu:
                 _fill_sample = _fill_sample.cuda()
@@ -81,7 +81,7 @@ def calculate_distance_term(means, n_objects, delta_d, norm=2, usegpu=True):
 
     dist_term = 0.0
     for i in range(bs):
-        _n_objects_sample = n_objects[i]
+        _n_objects_sample = int(n_objects[i])
 
         if _n_objects_sample <= 1:
             continue
