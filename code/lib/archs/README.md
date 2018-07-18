@@ -46,7 +46,7 @@
 
 ## Stacked Recurrent Hourglass
 
-* Proposed in []()
+* Proposed in [Instance Segmentation and Tracking with Cosine Embeddings and Recurrent Hourglass Networks](https://arxiv.org/pdf/1806.02070.pdf)
 * Can be found at `stacked_recurrent_hourglass.py`
 
 ```
