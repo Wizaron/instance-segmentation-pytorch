@@ -2,14 +2,14 @@ from torch import nn
 from torch.nn import functional as F
 from conv_gru import ConvGRUCell
 from coord_conv import CoordConv
-from list_module import ListModule
+from utils import ListModule
 
 
 class RecurrentHourglass(nn.Module):
 
     r"""RecurrentHourglass Module as defined in
-    Instance Segmentation and Tracking with Cosine Embeddings and Recurrent
-    Hourglass Networks (https://arxiv.org/pdf/1806.02070.pdf).
+    'Instance Segmentation and Tracking with Cosine Embeddings and Recurrent
+    Hourglass Networks' (https://arxiv.org/pdf/1806.02070.pdf).
 
     Args:
         input_n_filters (int): Number of channels in the input image
