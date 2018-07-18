@@ -82,7 +82,11 @@ class Model(object):
             self.model.load_state_dict(model_state_dict)
 
     def __define_variable(self, tensor, volatile=False):
-        return Variable(tensor, volatile=volatile)
+        if volatile:
+            with torch.no_grad():
+                return Variable(tensor)
+
+        return Variable(tensor)
 
     def __define_input_variables(
             self, features, fg_labels, ins_labels, n_objects, mode):
@@ -301,7 +305,7 @@ class Model(object):
             self.model.zero_grad()
             cost.backward()
             if clip_grad_norm != 0:
-                torch.nn.utils.clip_grad_norm(
+                torch.nn.utils.clip_grad_norm_(
                     self.model.parameters(), clip_grad_norm)
             self.optimizer.step()
 
