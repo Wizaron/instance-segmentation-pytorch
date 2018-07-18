@@ -36,9 +36,14 @@ class TrainingSettings(ModelSettings):
 
         self.HORIZONTAL_FLIPPING = False
         self.VERTICAL_FLIPPING = False
+        self.TRANSPOSING = False
         self.ROTATION_90X = False
         self.ROTATION = False
         self.COLOR_JITTERING = False
+        self.GRAYSCALING = False
+        self.CHANNEL_SWAPPING = False
+        self.GAMMA_ADJUSTMENT = False
+        self.RESOLUTION_DEGRADING = False
 
         self.CRITERION = 'Multi'
         # criterion - One of 'CE', 'Dice', 'Multi'
