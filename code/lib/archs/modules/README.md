@@ -1,6 +1,6 @@
 # Modules
 
-## Convolutional GRU
+## ConvGRUCell
 
 * Proposed in [Delving Deeper into Convolutional Networks for Learning Video Representations](https://arxiv.org/pdf/1511.06432.pdf)
 * Can be found at `conv_gru.py`
@@ -41,7 +41,7 @@
         >>> output = conv_gru(input, hidden)
 ```
 
-## Coordinate Convolution
+## AddCoordinates
 
 * Proposed in [An Intriguing Failing of Convolutional Neural Networks and the CoordConv Solution](https://arxiv.org/pdf/1807.03247.pdf)
 * Can be found at `coord_conv.py`
@@ -78,7 +78,113 @@
         >>> output = coord_adder(input)
 ```
 
-## Recurrent Hourglass
+## CoordConv
+
+* Proposed in [An Intriguing Failing of Convolutional Neural Networks and the CoordConv Solution](https://arxiv.org/pdf/1807.03247.pdf)
+* Can be found at `coord_conv.py`
+
+```
+    2D Convolution Module Using Extra Coordinate Information as defined
+    in 'An Intriguing Failing of Convolutional Neural Networks and the
+    CoordConv Solution' (https://arxiv.org/pdf/1807.03247.pdf).
+
+    Args:
+        Same as `torch.nn.Conv2d` with two additional arguments
+        with_r (bool, optional): If `True`, adds radius (`r`) coordinate
+            information to input image. Default: `False`
+        usegpu (bool, optional): If `True`, runs operations on GPU
+            Default: `True`
+
+    Shape:
+        - Input: `(N, C_{in}, H_{in}, W_{in})`
+        - Output: `(N, C_{out}, H_{out}, W_{out})`
+
+    Examples:
+        >>> coord_conv = CoordConv(3, 16, 3, with_r=True, usegpu=False)
+        >>> input = torch.randn(8, 3, 64, 64)
+        >>> output = coord_conv(input)
+
+        >>> coord_conv = CoordConv(3, 16, 3, with_r=True, usegpu=True).cuda()
+        >>> input = torch.randn(8, 3, 64, 64).cuda()
+        >>> output = coord_conv(input)
+```
+
+## CoordConvTranspose
+
+* Proposed in [An Intriguing Failing of Convolutional Neural Networks and the CoordConv Solution](https://arxiv.org/pdf/1807.03247.pdf)
+* Can be found at `coord_conv.py`
+
+```
+    2D Transposed Convolution Module Using Extra Coordinate Information
+    as defined in 'An Intriguing Failing of Convolutional Neural Networks and
+    the CoordConv Solution' (https://arxiv.org/pdf/1807.03247.pdf).
+
+    Args:
+        Same as `torch.nn.ConvTranspose2d` with two additional arguments
+        with_r (bool, optional): If `True`, adds radius (`r`) coordinate
+            information to input image. Default: `False`
+        usegpu (bool, optional): If `True`, runs operations on GPU
+            Default: `True`
+
+    Shape:
+        - Input: `(N, C_{in}, H_{in}, W_{in})`
+        - Output: `(N, C_{out}, H_{out}, W_{out})`
+
+    Examples:
+        >>> coord_conv_tr = CoordConvTranspose(3, 16, 3, with_r=True,
+        >>>                                    usegpu=False)
+        >>> input = torch.randn(8, 3, 64, 64)
+        >>> output = coord_conv_tr(input)
+
+        >>> coord_conv_tr = CoordConvTranspose(3, 16, 3, with_r=True,
+        >>>                                    usegpu=True).cuda()
+        >>> input = torch.randn(8, 3, 64, 64).cuda()
+        >>> output = coord_conv_tr(input)
+```
+
+## CoordConvNet
+
+* Proposed in [An Intriguing Failing of Convolutional Neural Networks and the CoordConv Solution](https://arxiv.org/pdf/1807.03247.pdf)
+* Can be found at `coord_conv.py`
+
+```
+    Improves 2D Convolutions inside a ConvNet by processing extra
+    coordinate information as defined in 'An Intriguing Failing of
+    Convolutional Neural Networks and the CoordConv Solution'
+    (https://arxiv.org/pdf/1807.03247.pdf).
+
+    This module adds coordinate information to inputs of each 2D convolution
+    module (`torch.nn.Conv2d`).
+
+    Assumption: ConvNet Model must contain single `Sequential` container
+    (`torch.nn.modules.container.Sequential`).
+
+    Args:
+        cnn_model: A ConvNet model that must contain single `Sequential`
+            container (`torch.nn.modules.container.Sequential`).
+        with_r (bool, optional): If `True`, adds radius (`r`) coordinate
+            information to input image. Default: `False`
+        usegpu (bool, optional): If `True`, runs operations on GPU
+            Default: `True`
+
+    Shape:
+        - Input: Same as the input of the model.
+        - Output: A list that contains all outputs (including
+            intermediate outputs) of the model.
+
+    Examples:
+        >>> cnn_model = ...
+        >>> cnn_model = CoordConvNet(cnn_model, True, False)
+        >>> input = torch.randn(8, 3, 64, 64)
+        >>> outputs = cnn_model(input)
+
+        >>> cnn_model = ...
+        >>> cnn_model = CoordConvNet(cnn_model, True, True).cuda()
+        >>> input = torch.randn(8, 3, 64, 64).cuda()
+        >>> outputs = cnn_model(input)
+```
+
+## RecurrentHourglass
 
 * Proposed in [Instance Segmentation and Tracking with Cosine Embeddings and Recurrent Hourglass Networks](https://arxiv.org/pdf/1806.02070.pdf)
 * Can be found at `recurrent_hourglass.py`
@@ -191,6 +297,40 @@
         >>> output = vgg16(input)
 
         >>> vgg16 = VGG16(16, True, True, True, True).cuda()
+        >>> input = torch.randn(8, 3, 64, 64).cuda()
+        >>> output = vgg16(input)
+```
+
+## SkipVGG16
+
+* Proposed in [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf)
+* Can be found at `vgg16.py`
+
+```
+    A module that returns output of 7th convolutional layer of the
+    VGG16 along with outputs of the 2nd and 4th convolutional layers.
+
+    Args:
+        pretrained (bool, optional): If `True`, initializes weights of the
+            VGG16 using weights trained on ImageNet. Default: `True`
+        use_coordinates (bool, optional): If `True`, adds `x`, `y` and radius
+            (`r`) coordinates to feature maps prior to each convolution.
+            Weights to process these coordinates are initialized as zero.
+            Default: `False`
+        usegpu (bool, optional): If `True`, runs operations on GPU
+            Default: `True`
+
+    Shape:
+        - Input: `(N, C_{in}, H_{in}, W_{in})`
+        - Output: List of outputs of the 2nd, 4th and 7th convolutional
+            layers of the VGG16, respectively.
+
+    Examples:
+        >>> vgg16 = SkipVGG16(True, True, False)
+        >>> input = torch.randn(8, 3, 64, 64)
+        >>> output = vgg16(input)
+
+        >>> vgg16 = SkipVGG16(True, True, True).cuda()
         >>> input = torch.randn(8, 3, 64, 64).cuda()
         >>> output = vgg16(input)
 ```
