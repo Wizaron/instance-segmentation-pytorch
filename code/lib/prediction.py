@@ -2,9 +2,9 @@ import torch.nn as nn
 import numpy as np
 from PIL import Image
 import cv2
-from sklearn.cluster import SpectralClustering
-
+from sklearn.cluster import KMeans
 from utils import ImageUtilities
+from archs.modules.coord_conv import AddCoordinates
 
 
 class Prediction(object):
@@ -25,8 +25,8 @@ class Prediction(object):
             self.resize_height, self.resize_width)
 
         if self.use_coordinates:
-            self.coordinate_adder = ImageUtilities.coordinate_adder(
-                self.resize_height, self.resize_width)
+            self.coordinate_adder = AddCoordinates(with_r=True,
+                                                   usegpu=False)
 
     def get_image(self, image_path):
 
@@ -56,9 +56,10 @@ class Prediction(object):
         sem_seg_prediction = sem_seg_prediction.cpu().numpy()
         sem_seg_prediction = sem_seg_prediction.argmax(0).astype(np.uint8)
 
-        embeddings = ImageUtilities.coordinate_adder(
-            seg_height, seg_width)(ins_seg_prediction)
-        embeddings = embeddings.cpu().numpy()
+        embeddings = ins_seg_prediction.cpu()
+        if self.use_coordinates:
+            embeddings = self.coordinate_adder(embeddings)
+        embeddings = embeddings.numpy()
         embeddings = embeddings.transpose(1, 2, 0)  # h, w, c
 
         n_objects_prediction = n_objects_prediction.cpu().numpy()[0]
@@ -66,16 +67,10 @@ class Prediction(object):
         embeddings = np.stack([embeddings[:, :, i][sem_seg_prediction != 0]
                                for i in range(embeddings.shape[2])], axis=1)
 
-        clustering = SpectralClustering(n_clusters=n_objects_prediction,
-                                        eigen_solver=None, random_state=None,
-                                        n_init=10, gamma=1.0, affinity='rbf',
-                                        n_neighbors=10, eigen_tol=0.0,
-                                        assign_labels='discretize', degree=3,
-                                        coef0=1,
-                                        kernel_params=None,
-                                        n_jobs=self.n_workers).fit(embeddings)
 
-        labels = clustering.labels_
+        labels = KMeans(n_clusters=n_objects_prediction,
+                        n_init=35, max_iter=500,
+                        n_jobs=self.n_workers).fit_predict(embeddings)
 
         instance_mask = np.zeros((seg_height, seg_width), dtype=np.uint8)
 
