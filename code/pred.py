@@ -16,8 +16,6 @@ parser.add_argument('--usegpu', action='store_true',
                     help='Enables cuda to predict on gpu')
 parser.add_argument('--output', required=True,
                     help='Path of the output directory')
-parser.add_argument('--n_workers', default=1, type=int,
-                    help='Number of workers for clustering')
 parser.add_argument('--dataset', type=str,
                     help='Name of the dataset which is "CVPPP"',
                     required=True)
@@ -49,8 +47,8 @@ model = Model(opt.dataset, ms.MODEL_NAME, ms.N_CLASSES, ms.MAX_N_OBJECTS,
               usegpu=opt.usegpu)
 
 prediction = Prediction(ms.IMAGE_HEIGHT, ms.IMAGE_WIDTH,
-                        ms.MEAN, ms.STD, ms.USE_COORDINATES, model,
-                        opt.n_workers)
+                        ms.MEAN, ms.STD, False, model,
+                        1)
 image, fg_seg_pred, ins_seg_pred, n_objects_pred = prediction.predict(
     image_path)
 
