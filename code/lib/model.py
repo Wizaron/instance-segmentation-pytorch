@@ -112,7 +112,7 @@ class Model(object):
         # Discriminative Loss
         if self.use_instance_segmentation:
             self.criterion_discriminative = DiscriminativeLoss(
-                delta_var, delta_dist, norm, self.usegpu)
+                delta_var, delta_dist, norm, usegpu=self.usegpu)
             if self.usegpu:
                 self.criterion_discriminative = \
                     self.criterion_discriminative.cuda()
